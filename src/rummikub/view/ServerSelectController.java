@@ -44,6 +44,7 @@ import rummikub.client.ws.GameDoesNotExists_Exception;
 import rummikub.client.ws.InvalidParameters_Exception;
 import rummikub.client.ws.RummikubWebService;
 import rummikub.client.ws.RummikubWebServiceService;
+import rummikubFX.Rummikub;
 //import rummikub.view.viewObjects.GameProp;
 
 /**
@@ -66,16 +67,12 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     private String DUP_NAME = "Duplicate game name insert new name";
     private RummikubWebServiceService service;
     private RummikubWebService rummikubWebService;
-    private int clientID;
+    private int playerID;
 
     public RummikubWebServiceService getService() {
         return service;
     }
-
-    public void setService(RummikubWebServiceService service) {
-        this.service = service;
-        this.rummikubWebService = service.getRummikubWebServicePort();
-    }
+    
 
     @FXML
     private GridPane GamesSettings;
@@ -113,6 +110,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     @FXML
     private void handleBackToMenuButtonAction(ActionEvent event) {
+        this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID,this);
     }
 
     @FXML
@@ -162,31 +160,54 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         new Thread(() -> {
             try {
                 rummikubWebService.createGame(gameNameInput.getText(), getNumOfHumansPlayers(), getNumOfComputerPlayers());
-                rummikubWebService.joinGame(gameNameInput.getText(), playerNameInput.getText());
+                this.setPlayerId(rummikubWebService.joinGame(gameNameInput.getText(), playerNameInput.getText()));
                     ObservableList<GameDetails> gameList = getListOfWaittingGames();
                     Platform.runLater(() -> {
                         gamesTableView.setItems(gameList);
+                        
                     });
+                        PlayScreenController gameScreen = (PlayScreenController)this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+                        gameScreen.setService(service);
+                        gameScreen.setPlayerId(playerID);
+                        gameScreen.initButtons(true);
+                        gameScreen.getEvents();
+                        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID,ScreensController.NOT_RESETABLE);
+                        //Platform.runLater(gameScreen::initAllGameComponents);
+                        
             } catch (DuplicateGameName_Exception ex) {
+                Platform.runLater(() -> showErrorMsg(errorMsg, ex.getMessage()));
+            } catch (InvalidParameters_Exception | GameDoesNotExists_Exception ex) {
                 Platform.runLater(() -> {
-                    showErrorMsg(errorMsg, ex.getFaultInfo().getMessage());
-                });
-            } catch (InvalidParameters_Exception ex) {
-                Platform.runLater(() -> {
-                    showErrorMsg(errorMsg, ex.getFaultInfo().getMessage());
-                });
-            } catch (GameDoesNotExists_Exception ex) {
-                Platform.runLater(() -> {
-                    showErrorMsg(errorMsg, ex.getFaultInfo().getMessage());
+                    showErrorMsg(errorMsg, ex.getMessage());
                 });
             }
-            Platform.runLater(() -> {
-                gameNameInput.clear();
-                numOfHumansInput.clear();
-                numOfCopmputersInput.clear();
-            });
+            Platform.runLater(() -> (clearInputFiled()));
         }).start();
     }
+    @FXML
+    public void joinButtonClicked() {
+        new Thread(() -> {
+        RummikubWebService rummikubWebService = service.getRummikubWebServicePort();
+        try {
+            setPlayerId(rummikubWebService.joinGame(this.gamesTableView.getSelectionModel().getSelectedItem().getName(), this.playerNameInput.getText()));
+            Platform.runLater(() -> {
+                 clearInputFiled();
+            });
+                 PlayScreenController gameScreen = (PlayScreenController)this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+                 gameScreen.setService(service);
+                 gameScreen.setPlayerId(playerID);
+                 gameScreen.initButtons(true);
+                 gameScreen.getEvents();
+                 this.myController.setScreen(Rummikub.PLAY_SCREEN_ID,ScreensController.NOT_RESETABLE);
+                 //Platform.runLater(gameScreen::initAllGameComponents);
+            //////TODO 
+        } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
+            Platform.runLater(() -> {showErrorMsg(errorMsg, ex.getMessage());});
+        }
+        Platform.runLater(() -> {this.gamesTableView.getSelectionModel().clearSelection();});
+        }).start();
+    }
+
 
     private synchronized ObservableList<GameDetails> getListOfWaittingGames() {
         //new Threa
@@ -222,21 +243,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     }
 
     //Delete button clicked
-    @FXML
-    public void joinButtonClicked() {
-        RummikubWebService rummikubWebService = service.getRummikubWebServicePort();
-        try {
-            rummikubWebService.joinGame(this.gamesTableView.getSelectionModel().getSelectedItem().getName(), this.playerNameInput.getText());
-            this.playerNameInput.clear();
-            //////TODO 
-        } catch (GameDoesNotExists_Exception ex) {
-            showErrorMsg(errorMsg, ex.getMessage());
-        } catch (InvalidParameters_Exception ex) {
-            showErrorMsg(errorMsg, ex.getMessage());
-        }
-        this.gamesTableView.getSelectionModel().clearSelection();
-    }
-
+    
     @Override
     public void setScreenParent(ScreensController parentScreen) {
         this.myController = parentScreen;
@@ -316,7 +323,10 @@ public class ServerSelectController implements ServerConnection, Initializable, 
                 return true;
             }
         }
-        showErrorMsg(this.errorMsg, INVALID_GAME_NAME_MSG);
+        if(!allInputFieldEmpty()){
+        Platform.runLater(() -> (showErrorMsg(errorMsg, INVALID_GAME_NAME_MSG)));
+        
+        }
         return false;
     }
 
@@ -348,16 +358,34 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     private void initJoinButton() {
         this.joinButton.setDisable((this.playerNameInput.getText().isEmpty() || !this.gamesTableView.getSelectionModel().isSelected(0)));
     }
-
+    @Override
+    public void setService(RummikubWebServiceService service) {
+        this.service = service;
+        this.rummikubWebService = service.getRummikubWebServicePort();
+    }
+    
     @Override
     public void setPlayerId(int playerId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.playerID=playerId;
     }
 
     @Override
     public int getPlayerId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return this.playerID;
     }
+
+    private boolean allInputFieldEmpty() {
+        return (this.numOfCopmputersInput.getText().isEmpty()&&this.numOfHumansInput.getText().isEmpty()&&this.gameNameInput.getText().isEmpty());
+    }
+
+    private void clearInputFiled() {
+                gameNameInput.clear();
+                numOfHumansInput.clear();
+                numOfCopmputersInput.clear();
+                playerNameInput.clear();
+
+    }
+    
 
 }
 //public class NumberTextField extends TextField

@@ -7,6 +7,10 @@ import java.awt.Point;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -32,6 +36,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
+import rummikub.client.ws.InvalidParameters_Exception;
+import rummikub.client.ws.RummikubWebService;
+import rummikub.client.ws.RummikubWebServiceService;
 import rummikub.gameLogic.model.gameobjects.Tile;
 import rummikub.gameLogic.model.logic.GameLogic;
 import rummikub.gameLogic.model.logic.Settings;
@@ -53,7 +60,7 @@ import rummikub.view.viewObjects.AnimatedTilePane;
  *
  * @author Arthur
  */
-public class PlayScreenController implements Initializable, ResetableScreen, ControlledScreen {
+public class PlayScreenController implements Initializable, ResetableScreen, ControlledScreen,ServerConnection {
 
     //Constatns
     private static final String styleWhite = "-fx-text-fill: white";
@@ -65,7 +72,10 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private static final boolean ENABLE_BUTTON = true;
     private static final boolean DISABLE_DRAG_AND_DROP = true;
     private static final long SLEEP_TIME_IN_MILLISECOUNDS = 1000;
-
+    private RummikubWebServiceService service;
+    private RummikubWebService rummikubWebService;
+    private int playerID;
+    private int currEvent;
     //FXML Private filds
     @FXML private Label errorMsg;
     @FXML private BorderPane board;
@@ -118,7 +128,20 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private void handleWithdrawCardAction(ActionEvent event) {
         onWithdrawCardAndSkipTurnAction(event);
     }
-
+    public void getEvents(){
+//        try {
+//            this.rummikubWebService.getEvents(playerID,);//todo 
+//        } catch (InvalidParameters_Exception ex) {
+//            Logger.getLogger(PlayScreenController.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        
+        Timer timer=new Timer();// allready open new thared 
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getEvents();
+            }}, 1000);
+    }
     //Private methods
     private void setHandEvents() {
         this.handTile.setOnDragOver(this::onDragOverOfHandTilePane);
@@ -466,7 +489,8 @@ public static void showGameMsg(Label label,String msg){
         boolean disableButtons = isComputerPlayer;
 
         Platform.runLater(() -> {
-            buttonsList.stream().forEach((controllButton) -> { controllButton.setDisable(disableButtons); });
+            //buttonsList.stream().forEach((controllButton) -> { controllButton.setDisable(disableButtons); });
+            initButtons(disableButtons);
         });
 
         if (isComputerPlayer) {
@@ -617,7 +641,6 @@ public static void showGameMsg(Label label,String msg){
         this.swapTurnTimeLineDelay = new Timeline(new KeyFrame(Duration.millis(800), (ActionEvent event1) -> {swapTurns();}));
         this.isLegalMove = new SimpleBooleanProperty(false);
         this.isUserMadeFirstMoveInGame = CAN_SAVE_THE_GAME; 
-
         setHandEvents();
     }
 
@@ -637,6 +660,31 @@ public static void showGameMsg(Label label,String msg){
     @Override
     public void setScreenParent(ScreensController parentScreen) {
         this.myController = parentScreen;
+    }
+
+    @Override
+    public void setService(RummikubWebServiceService service) {
+        this.service = service;
+        this.rummikubWebService = service.getRummikubWebServicePort();
+    }
+    
+    @Override
+    public void setPlayerId(int playerId) {
+        this.playerID=playerId;
+    }
+
+    @Override
+    public int getPlayerId() {
+    return this.playerID;
+    }
+
+    @Override
+    public RummikubWebServiceService getService() {
+        return this.service;
+    }
+
+    public void initButtons(boolean disableButtons) {
+        buttonsList.stream().forEach((controllButton) -> { controllButton.setDisable(disableButtons); });
     }
 }
 
