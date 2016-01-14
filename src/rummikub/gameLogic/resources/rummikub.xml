@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rummikub xsi:noNamespaceSchemaLocation="rummikub.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    current_player="paul" name="game1">
+    <players>
+        <player type="HUMAN" name="john">
+            <tiles>
+                <tile color="YELLOW"    value="1"></tile>
+                <tile color="BLACK"     value="10"></tile>
+                <tile color="BLUE"      value="1"></tile>
+                <tile color="RED"       value="7"></tile>
+                <tile color="BLACK"     value="9"></tile>
+                <tile color="RED"       value="12"></tile>
+                <tile color="RED"       value="1"></tile>
+                <tile color="BLACK"     value="3"></tile>
+                <tile color="BLACK"     value="2"></tile>
+                <tile color="YELLOW"    value="8"></tile>
+                <tile color="BLUE"      value="4"></tile>
+            </tiles>
+        </player>
+        <player type="COMPUTER" name="paul">
+            <tiles>
+                <tile color="BLUE"      value="4"></tile>
+                <tile color="BLACK"     value="5"></tile>
+                <tile color="BLUE"      value="1"></tile>
+                <tile color="BLUE"      value="8"></tile>
+                <tile color="BLACK"     value="13"></tile>
+                <tile color="BLACK"     value="7"></tile>
+                <tile color="YELLOW"    value="9"></tile>
+                <tile color="RED"       value="11"></tile>
+                <tile color="RED"       value="13"></tile>
+                <tile color="BLACK"     value="8"></tile>
+                <tile color="YELLOW"    value="4"></tile>
+                <tile color="BLUE"      value="6"></tile>
+                <tile color="RED"       value="6"></tile>
+                <tile color="BLUE"      value="2"></tile>
+            </tiles>
+        </player>
+    </players>
+    <board>
+        <sequence>
+            <tile color="RED" value="10"></tile>
+            <tile color="RED" value="11"></tile>
+            <tile color="RED" value="12"></tile>
+        </sequence>
+    </board>
+</rummikub>

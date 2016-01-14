@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane fx:id="GamesSettings" alignment="CENTER" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" snapToPixel="false" styleClass="menu" stylesheets="@resources/menusStyle.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="rummikub.view.GameParametersController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="ALWAYS" maxWidth="160.0" minWidth="10.0" prefWidth="140.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="195.0" minWidth="10.0" prefWidth="188.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="183.0" minWidth="10.0" prefWidth="183.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="160.0" minWidth="10.0" prefWidth="140.0" />
+  </columnConstraints>
+  <rowConstraints>
+      <RowConstraints maxHeight="182.0" minHeight="10.0" prefHeight="57.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="182.0" minHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="48.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="316.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="316.0" minHeight="10.0" prefHeight="124.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="316.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="254.0" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Label prefHeight="29.0" prefWidth="180.0" stylesheets="@resources/menusStyle.css" text="Game's name:" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin></Label>
+      <TextField fx:id="gameName" onAction="#handleGameNameTextChange" prefHeight="25.0" prefWidth="286.0" text="name" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
+         <opaqueInsets>
+            <Insets left="10.0" right="10.0" />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets left="110.0" right="10.0" />
+         </GridPane.margin></TextField>
+      <Text id="GamesSettings-text" strokeType="OUTSIDE" strokeWidth="0.0" text="GamesSettings" textAlignment="CENTER" wrappingWidth="385.328125" GridPane.columnIndex="1" />
+      <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleBackToMenuButtonAction" prefHeight="52.0" prefWidth="141.0" text="Back to menu" GridPane.columnIndex="1" GridPane.rowIndex="9">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets left="25.0" />
+         </GridPane.margin>
+      </Button>
+      <Button fx:id="StartPlayingButton" alignment="CENTER" contentDisplay="CENTER" disable="true" layoutX="35.0" layoutY="366.0" mnemonicParsing="false" onAction="#handleStartPlayingButtonAction" prefHeight="52.0" prefWidth="141.0" text="Start Playing" GridPane.columnIndex="2" GridPane.rowIndex="9">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets left="25.0" />
+         </GridPane.margin>
+      </Button>
+      <HBox fx:id="configPlayer1" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4">
+         <children>
+            <Label alignment="TOP_LEFT" pickOnBounds="false" prefWidth="120.0" styleClass="lable" text="First Player:" textAlignment="CENTER">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField id="name" fx:id="playerName1" onAction="#handlePlayerNameTextChange" prefHeight="25.0" prefWidth="158.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </TextField>
+            <CheckBox fx:id="isComputer1" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCheckBoxSelection" prefHeight="20.0" prefWidth="156.0" styleClass="checkBox" text="Computer player" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </CheckBox>
+         </children>
+      </HBox>
+      <HBox fx:id="configPlayer2" alignment="CENTER_LEFT" layoutX="176.0" layoutY="241.0" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5">
+         <children>
+            <Label alignment="TOP_LEFT" pickOnBounds="false" prefWidth="120.0" styleClass="lable" text="Secound Player:" textAlignment="CENTER">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="playerName2" onAction="#handlePlayerNameTextChange" prefHeight="25.0" prefWidth="158.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </TextField>
+            <CheckBox fx:id="isComputer2" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCheckBoxSelection" prefHeight="20.0" prefWidth="156.0" styleClass="checkBox" text="Computer player" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </CheckBox>
+         </children>
+      </HBox>
+      <HBox fx:id="configPlayer3" alignment="CENTER_LEFT" layoutX="176.0" layoutY="298.0" prefHeight="100.0" prefWidth="200.0" spacing="10.0" styleClass="..\resources\menusStyle.css" visible="false" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="6">
+         <children>
+            <Label alignment="TOP_LEFT" contentDisplay="TOP" pickOnBounds="false" prefWidth="120.0" styleClass="lable" text="Third Player:" textAlignment="CENTER">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="playerName3" onAction="#handlePlayerNameTextChange" prefHeight="25.0" prefWidth="158.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </TextField>
+            <CheckBox fx:id="isComputer3" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCheckBoxSelection" prefHeight="20.0" prefWidth="156.0" styleClass="checkBox" text="Computer player" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </CheckBox>
+         </children>
+      </HBox>
+      <HBox fx:id="configPlayer4" alignment="CENTER_LEFT" layoutX="176.0" layoutY="298.0" prefHeight="100.0" prefWidth="200.0" spacing="10.0" visible="false" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="7">
+         <children>
+            <Label alignment="TOP_LEFT" contentDisplay="TOP" pickOnBounds="false" prefWidth="120.0" styleClass="lable" text="Fourth Player:" textAlignment="CENTER">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="playerName4" onAction="#handlePlayerNameTextChange" prefHeight="25.0" prefWidth="158.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </TextField>
+            <CheckBox fx:id="isComputer4" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCheckBoxSelection" prefHeight="20.0" prefWidth="156.0" styleClass="checkBox" text="Computer player" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </CheckBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="15.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+         <children>
+            <Label stylesheets="@resources/menusStyle.css" text="Number of players:" textAlignment="CENTER" />
+            <RadioButton fx:id="B2" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleRadioButtonChanged" selected="true" text="2" toggleGroup="$radioButtonGroup">
+               <toggleGroup>
+                  <ToggleGroup fx:id="radioButtonGroup" />
+               </toggleGroup>
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </RadioButton>
+            <RadioButton fx:id="B3" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRadioButtonChanged" text="3" toggleGroup="$radioButtonGroup">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+               <toggleGroup>
+                  <ToggleGroup fx:id="radioButtonGroup1" />
+               </toggleGroup>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </RadioButton>
+            <RadioButton fx:id="B4" contentDisplay="CENTER" layoutX="44.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRadioButtonChanged" text="4" toggleGroup="$radioButtonGroup">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+               <toggleGroup>
+                  <ToggleGroup fx:id="radioButtonGroup11" />
+               </toggleGroup>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </RadioButton>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+      </HBox>
+      <Label id="errorMsg" fx:id="errorMsg" alignment="TOP_CENTER" contentDisplay="TOP" prefHeight="20.0" prefWidth="381.0" stylesheets="@resources/menusStyle.css" textAlignment="CENTER" textFill="#ee3737" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+   </children>
+</GridPane>

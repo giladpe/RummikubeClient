@@ -1,0 +1,168 @@
+.root {
+    -fx-background-image: url("MenuPic1.jpg");
+    -fx-background-position: center ;
+    -fx-background-size:100% 100%;
+    -fx-background-repeat: no-repeat;
+}
+.bar{
+
+    -fx-background-image: url("Bar.png");
+    -fx-background-position: center ;
+    -fx-background-size:100% 100%;
+    -fx-background-repeat: no-repeat;
+
+
+}
+.menu {
+    -fx-background-image: url("MenuBackground.jpg");
+    -fx-background-position: center ;
+    -fx-background-size:100% 100%;
+    -fx-background-repeat: no-repeat;
+    -fx-font-family: Georgia;
+}
+
+.button {
+    -fx-text-fill: black;
+    -fx-font-family: Georgia;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#ebd6ba, #a9957d);
+    -fx-background-image: url("TileMenuButton.png");
+    -fx-background-size:100% 100%;
+    -fx-background-position: center;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+.button:hover {
+    -fx-background-image: url("TileMenuButtonHover.png");
+    -fx-background-size:100% 100%;
+    -fx-background-position: center;
+    -fx-border-top-color: #edcba8;
+    -fx-background-color: linear-gradient(#452204, #a9957d);
+    -fx-text-fill: white;
+    -fx-font-family: Georgia;
+}
+#nameF{
+    -fx-text-fill: white;
+    -fx-font-family: Georgia;
+    -fx-font-weight: bold;
+    -fx-pref-height: 30;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+#nameFcurrPlayer{
+
+    -fx-text-fill: black;
+    -fx-font-family: Georgia;
+    -fx-font-weight: bold;
+    -fx-background-image: url("nameF_Hover.png");
+    -fx-background-size:100% 100%;
+    -fx-background-position: center;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+#orgenaize{
+    -fx-text-fill: black;
+    -fx-font-family: Georgia;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#ebd6ba, #a9957d);
+    -fx-background-image: url("Orgenaize.png");
+    -fx-background-size:100% 100%;
+    -fx-background-position: center;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+#orgenaize:hover{
+
+    -fx-text-fill: black;
+    -fx-font-family: Georgia;
+    -fx-font-weight: bold;
+    -fx-background-image: url("OrgenaizeHover_1.png");
+    -fx-background-size:100% 100%;
+    -fx-background-position: center;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+.checkBox {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+#GamesSettings-text {
+    -fx-font-size: 32px;
+    -fx-font-family: Georgia;
+    -fx-fill: #333333;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+#winnerMsg{
+    -fx-font-size: 40px;
+    -fx-font-family: Georgia;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+#winnerName{
+    -fx-font-size: 40px;
+    -fx-font-family: Georgia;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+    
+}
+#gameMsg{
+    -fx-stroke-width: 1;
+    -fx-stroke: white;   
+    -fx-font-family: Georgia;
+    -fx-font-size: 16px;
+    -fx-text-fill: greenyellow;
+    -fx-font-weight: bold;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+
+#errorMsg{
+    -fx-font-family: Georgia;
+    -fx-font-size: 16px;
+    -fx-text-fill: #ff0000;
+    -fx-font-weight: bold;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+#msg{
+    -fx-font-family: Georgia;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2 );
+}
+
+#hand{
+    -fx-background-image: url("PlayerHand.png");
+    -fx-background-position: center ;
+    -fx-background-size:100% 100%;
+    -fx-background-repeat: no-repeat;
+}
+
+
+withdrawCard{
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+.tile {
+    -fx-background-image: url("tile.png");
+    -fx-background-size:100% 100%;
+    -fx-background-position: center;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+    -fx-pref-tile-height: 40;
+    -fx-pref-tile-width: 30;
+}
+.tileText {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+/*.tile:hover {
+    -fx-font-size: 18px;
+}*/
+
+
+/*.tileText:hover {
+    -fx-font-size: 18px;
+}*/

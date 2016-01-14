@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="file:/C:/Users/Arthur/Desktop/RummikubWebService/RummikubFX/src/resources/rummikub.xsd" uri="xml-resources/jaxb/XmlClasses/rummikub.xsd"/>
+    <system systemId="http://localhost:8080/RummikubApi/RummikubWebServiceService" uri="xml-resources/web-service-references/RummikubWebServiceService/wsdl/localhost_8080/RummikubApi/RummikubWebServiceService.xml"/>
+    <system systemId="http://localhost:8080/RummikubApi/RummikubWebServiceService?wsdl" uri="xml-resources/web-service-references/RummikubWebServiceService/wsdl/localhost_8080/RummikubApi/RummikubWebServiceService.wsdl"/>
+    <system systemId="http://localhost:8080/RummikubApi/RummikubWebServiceService?xsd=1" uri="xml-resources/web-service-references/RummikubWebServiceService/wsdl/localhost_8080/RummikubApi/RummikubWebServiceService.xsd_1.xsd"/>
+</catalog>

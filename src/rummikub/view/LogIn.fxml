@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane fx:id="GamesSettings" alignment="CENTER" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" snapToPixel="false" styleClass="menu" stylesheets="@resources/menusStyle.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="rummikub.view.LogInController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="ALWAYS" maxWidth="160.0" minWidth="10.0" prefWidth="140.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="195.0" minWidth="10.0" prefWidth="188.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="183.0" minWidth="10.0" prefWidth="183.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="160.0" minWidth="10.0" prefWidth="140.0" />
+  </columnConstraints>
+  <rowConstraints>
+      <RowConstraints maxHeight="182.0" minHeight="10.0" prefHeight="57.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="182.0" minHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="48.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="316.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="316.0" minHeight="10.0" prefHeight="124.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="316.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="254.0" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Label prefHeight="29.0" prefWidth="180.0" stylesheets="@resources/menusStyle.css" text="Server Address:" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin></Label>
+      <TextField fx:id="address" onAction="#handleServerAddressTextChange" prefHeight="25.0" prefWidth="236.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
+         <opaqueInsets>
+            <Insets left="10.0" right="10.0" />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets left="110.0" right="10.0" />
+         </GridPane.margin></TextField>
+      <Text id="GamesSettings-text" strokeType="OUTSIDE" strokeWidth="0.0" text="Log In To Server" textAlignment="CENTER" wrappingWidth="385.328125" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Button fx:id="exit" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleExitButtonAction" prefHeight="52.0" prefWidth="141.0" text="Exit" GridPane.columnIndex="1" GridPane.rowIndex="9">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets left="25.0" />
+         </GridPane.margin>
+      </Button>
+      <Button fx:id="loginButton" alignment="CENTER" contentDisplay="CENTER" layoutX="35.0" layoutY="366.0" mnemonicParsing="false" onAction="#handleLoginButtonAction" prefHeight="52.0" prefWidth="141.0" text="Login" GridPane.columnIndex="2" GridPane.rowIndex="9">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets left="25.0" />
+         </GridPane.margin>
+      </Button>
+      <HBox fx:id="configPlayer1" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4">
+         <children>
+            <Label alignment="TOP_LEFT" pickOnBounds="false" prefHeight="16.0" prefWidth="101.0" styleClass="lable" text="Server Port:" textAlignment="CENTER">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField id="name" fx:id="port" onAction="#handleServrtPortTextChange" prefHeight="25.0" prefWidth="163.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </TextField>
+         </children>
+      </HBox>
+      <Label id="errorMsg" fx:id="errorMsg" alignment="TOP_CENTER" contentDisplay="TOP" prefHeight="20.0" prefWidth="381.0" stylesheets="@resources/menusStyle.css" textAlignment="CENTER" textFill="#ee3737" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+      <CheckBox id="checkBox" fx:id="changeServerCheckBox" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" styleClass="checkBox" text="Enable Server changes" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+   </children>
+</GridPane>

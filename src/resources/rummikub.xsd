@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="rummikub">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="players" type="players">
+                    <xs:unique name="unique-player-name">
+                        <xs:selector xpath="player"/>
+                        <xs:field xpath="@name"/>
+                    </xs:unique>
+                </xs:element>
+                <xs:element name="board" type="board">
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="current_player" type="xs:string" use="required"/>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="players">
+        <xs:sequence minOccurs="2" maxOccurs="4">
+            <xs:element name="player">
+                <xs:complexType>
+                    <xs:sequence minOccurs="1" maxOccurs="1">
+                        <xs:element name="tiles">
+                            <xs:complexType>
+                                <xs:sequence minOccurs="1" maxOccurs="92">
+                                    <xs:element name="tile" type="tile">
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="type" type="playerType" use="required"/>
+                    <xs:attribute name="name" type="xs:string" use="required"/>
+                    <xs:attribute name="placed_first_sequence" type="xs:boolean" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="playerType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="HUMAN"/>
+            <xs:enumeration value="COMPUTER"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="color">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="BLACK"/>
+            <xs:enumeration value="RED"/>
+            <xs:enumeration value="BLUE"/>
+            <xs:enumeration value="YELLOW"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="tile_value">
+        <xs:restriction base="xs:nonNegativeInteger">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="13"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="tile">
+        <xs:attribute name="color" use="required" type="color"></xs:attribute>
+        <xs:attribute name="value" use="required" type="tile_value"></xs:attribute>
+    </xs:complexType>
+    
+    <xs:complexType name="board">
+        <xs:sequence minOccurs="0" maxOccurs="30">
+            <xs:element name="sequence">
+                <xs:complexType>
+                    <xs:sequence minOccurs="3" maxOccurs="13">
+                        <xs:element name="tile" type="tile">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
