@@ -29,7 +29,7 @@ import rummikubFX.Rummikub;
  *
  * @author giladPe
  */
-public class LogInController implements Initializable, ControlledScreen, ResetableScreen {
+public class LogInController implements Initializable, ControlledScreen, ResetableScreen,ServerConnection {
 
     @FXML
     private GridPane GamesSettings;
@@ -84,10 +84,8 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
             //create a new service with the URL
             ServerSelectController gameSeettingsScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
             this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSeettingsScene);
-            RummikubWebServiceService service = new RummikubWebServiceService(location);
-            gameSeettingsScene.setService(service);
+            gameSeettingsScene.setService(new RummikubWebServiceService(location));
             this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID,gameSeettingsScene);
-            
             resetScreen();
         } catch (MalformedURLException ex) {
             this.errorMsg.setText("Invalid Url");/////to change
@@ -113,6 +111,26 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
 
     @FXML
     private void handleServrtPortTextChange(ActionEvent event) {
+    }
+
+    @Override
+    public void setService(RummikubWebServiceService service) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setPlayerId(int playerId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getPlayerId() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public RummikubWebServiceService getService() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
 
