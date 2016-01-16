@@ -173,25 +173,20 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     public void getRummikubeWsEvents() {
+
+        List<Event> eventList;
         try {
-
-            List<Event> eventList = this.rummikubWebService.getEvents(playerID, currEventId);//todo 
-            try {
-                myDetails = this.rummikubWebService.getPlayerDetails(playerID);
-            } catch (GameDoesNotExists_Exception ex) {
-                ///////todo
-            }
+            eventList = this.rummikubWebService.getEvents(playerID, currEventId); //todo
             if (!eventList.isEmpty()) {
-                for (Iterator<Event> it = eventList.iterator(); it.hasNext();) {
-                    Event event = it.next();
-                    handelRummikubWsEvent(eventList.get(event.getId()));
-
+                for (Event event : eventList) {
+                    handleRummikubWsEvent(event);
                 }
                 currEventId = getLastEventID(eventList);
             }
         } catch (InvalidParameters_Exception ex) {
-            Logger.getLogger(PlayScreenController.class.getName()).log(Level.SEVERE, null, ex);
+            Platform.runLater(() -> (showGameMsg(errorMsg, ex.getMessage())));
         }
+
         timer.cancel();
         this.timer = new Timer(DAEMON_THREAD);// allready open new thared 
         timer.schedule(new TimerTask() {
@@ -269,7 +264,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         logicBoard = new Board();
         Platform.runLater(() -> {
             setPlayersBarWs();
-            showPlayerHandWs();
             initPlayerLabelWs();
 
         });
@@ -308,40 +302,50 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     private void showPlayerHandWs() {
-        //createPlayerHandWs(rummikubWebService.getPlayerDetails(playerID).getTiles());
+        try {
+            myDetails = this.rummikubWebService.getPlayerDetails(playerID);
+        } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
+            showGameMsg(errorMsg, ex.getMessage());
+        }
         createPlayerHandWs(myDetails.getTiles());
     }
 
     private void onMakeSingleMove(SingleMove singleMove) {
         Point source = singleMove.getpSource();
         Point target = singleMove.getpTarget();
-        boolean isLegal = true;
 
-        try {
-            switch (singleMove.getMoveType()) {
-                case BOARD_TO_BOARD:
-                    this.rummikubWebService.moveTile(playerID, source.x, source.y, target.x, target.y);
-                    break;
-                case BOARD_TO_HAND:
-                    this.rummikubWebService.takeBackTile(playerID, source.x, source.y);
-                    break;
-                case HAND_TO_BOARD:
-                default:
-                    rummikub.client.ws.Tile tile = myDetails.getTiles().get(singleMove.getnSource());
-                    if (isNewSequance(target.x)) {
-                        ArrayList<rummikub.client.ws.Tile> tileList = new ArrayList<>();
-                        tileList.add(tile);
-                        this.rummikubWebService.createSequence(playerID, tileList);
-                    } else {
-                        this.rummikubWebService.addTile(playerID, tile, target.x, target.y);
-                    }
-                    break;
+        Thread thread = new Thread(() -> {
+            boolean isLegal = true;
+            try {
 
+                switch (singleMove.getMoveType()) {
+                    case BOARD_TO_BOARD:
+                        this.rummikubWebService.moveTile(playerID, source.x, source.y, target.x, target.y);
+                        break;
+                    case BOARD_TO_HAND:
+                        this.rummikubWebService.takeBackTile(playerID, source.x, source.y);
+                        break;
+                    case HAND_TO_BOARD:
+                    default:
+                        rummikub.client.ws.Tile tile = myDetails.getTiles().get(singleMove.getnSource());
+                        if (isNewSequance(target.x)) {
+                            ArrayList<rummikub.client.ws.Tile> tileList = new ArrayList<>();
+                            tileList.add(tile);
+                            this.rummikubWebService.createSequence(playerID, tileList);
+                        } else {
+                            this.rummikubWebService.addTile(playerID, tile, target.x, target.y);
+                        }
+                        break;
+
+                }
+            } catch (InvalidParameters_Exception ex) {
+                Platform.runLater(() -> (showGameMsg(this.errorMsg, ex.getMessage())));
+                isLegal = false;
             }
-        } catch (InvalidParameters_Exception ex) {
-            showGameMsg(this.errorMsg, ex.getMessage());
-            isLegal = false;
-        }
+            this.isLegalMove.set(isLegal);
+        });
+        thread.setDaemon(DAEMON_THREAD);
+        thread.start();
 
 //        if (!this.isUserMadeFirstMoveInGame) {
 //            this.isUserMadeFirstMoveInGame = !CAN_SAVE_THE_GAME;
@@ -353,7 +357,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 //            initCurrentPlayerMove();
 //            showGameBoardAndPlayerHand();
 //        }
-        this.isLegalMove.set(isLegal);
     }
 
     private void onSuccesfulyCompletedMove(boolean newVal) {
@@ -376,7 +379,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         for (Serie serie : serieList) {
             flowPaneSeriesList.add(createFlowPaneSerie(serie));
         }
-
         centerPane.getChildren().addAll(flowPaneSeriesList);
     }
 
@@ -586,7 +588,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 //        }
 //    }
 
-    private void handelRummikubWsEvent(rummikub.client.ws.Event event) {
+    private void handleRummikubWsEvent(rummikub.client.ws.Event event) {
         // <editor-fold defaultstate="collapsed" desc="Game Events Description">
         /*
         • Game Start – game started
@@ -609,7 +611,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 break;
             }
             case GAME_START: {
-                handleGameStartEvent(event);
+                handleGameStartEvent(event);////done
                 break;
             }
             case GAME_WINNER: {
@@ -617,7 +619,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 break;
             }
             case PLAYER_FINISHED_TURN: {
-                handlePlayerFinishedTurnEvent(event);
+                handlePlayerFinishedTurnEvent(event); 
                 break;
             }
             case PLAYER_RESIGNED: {
@@ -625,7 +627,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 break;
             }
             case PLAYER_TURN: {
-                handlePlayerTurnEvent(event);
+                handlePlayerTurnEvent(event); ////done need to check
                 break;
             }
             case REVERT: {
@@ -633,15 +635,15 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 break;
             }
             case SEQUENCE_CREATED: {
-                handleSequenceCreatedEvent(event);
+                handleSequenceCreatedEvent(event); //done need to check
                 break;
             }
             case TILE_ADDED: {
-                handleTileAddedEvent(event);
+                handleTileAddedEvent(event);   //done 
                 break;
             }
             case TILE_MOVED: {
-                handleTileMovedEvent(event);
+                handleTileMovedEvent(event);  //done need to check
 
                 break;
             }
@@ -798,7 +800,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     private void handlePlayerFinishedTurnEvent(Event event) {
-
+        Platform.runLater(()->(showPlayerHandWs()));
     }
 
     private void handlePlayerResignedEvent(Event event) {
@@ -807,12 +809,20 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private void handlePlayerTurnEvent(Event event) {
         this.nameOfCurrPlayerTurn = event.getPlayerName();
         String turnMsg = getTurnMsg();
+        Thread thread=new Thread(()->{
+            try {
+                playersDetails=this.rummikubWebService.getPlayersDetails(gameName);
+            } catch (GameDoesNotExists_Exception ex) {
+                Platform.runLater(()->(showGameMsg(errorMsg, ex.getMessage())));
+            }
+        });
         Platform.runLater(() -> {
+            initPlayerLabelWs();
             updateCurrPlayerBarWs(nameOfCurrPlayerTurn);
             this.turnMsgLabel.setText(turnMsg);
             this.showPlayerHandWs();
         });
-        if (nameOfCurrPlayerTurn.equalsIgnoreCase(this.myDetails.getName())) {
+        if (isMyTurn()) {
             Platform.runLater(() -> {
                 enableButtons();
                 this.turnMsgLabel.setStyle(STYLE_GREEN);
@@ -827,16 +837,48 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     private void handleRevertEvent(Event event) {
+        this.logicBoard=new Board();
+        
     }
 
     private void handleTileAddedEvent(Event event) {
+
+        int sourcePosition = event.getSourceSequencePosition();
+        int targetSerie = event.getTargetSequenceIndex();
+        int targetPosition = event.getTargetSequencePosition();
+        Serie toSerie = this.logicBoard.getSeries(targetSerie);
+        rummikub.client.ws.Tile tile = this.myDetails.getTiles().get(sourcePosition);
+        toSerie.addSpecificTileToSerie(convertWsTileToLogicTile(tile), targetPosition); //maybe need to check if to add to end 
+        Platform.runLater(() -> {
+            showGameBoard();
+            showPlayerHandWs();
+        });
+
     }
 
     private void handleSequenceCreatedEvent(Event event) {
-
+        List<rummikub.client.ws.Tile> serieToAdd = event.getTiles();
+        Serie serie = getLogicFromWsTileList(serieToAdd);
+        logicBoard.addSeries(serie);
+        Platform.runLater(() -> {
+            showGameBoard();
+            showPlayerHandWs(); //may be no need this 
+        });
+        //Platform.runLater(() -> {centerPane.getChildren().add(createFlowPaneSerie(serie));});
     }
 
     private void handleTileMovedEvent(Event event) {
+        int sourcePosition = event.getSourceSequencePosition();
+        int sourceSerie = event.getSourceSequenceIndex();
+        int targetSerie = event.getTargetSequenceIndex();
+        int targetPosition = event.getTargetSequencePosition();
+        Serie fromSerie = this.logicBoard.getSeries(sourceSerie);
+        Serie toSerie = this.logicBoard.getSeries(targetSerie);
+        Tile tile = fromSerie.getSpecificTile(sourcePosition);
+        fromSerie.removeSpecificTile(sourcePosition);
+        toSerie.addSpecificTileToSerie(tile, targetPosition); //maybe need to check if to add to end 
+        Platform.runLater(() -> (showGameBoard()));
+
     }
 
     private void handleTileReturnedEvent(Event event) {
@@ -998,5 +1040,13 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     private boolean isMyTurn() {
         return this.nameOfCurrPlayerTurn.equalsIgnoreCase(this.myDetails.getName());
+    }
+
+    private Serie getLogicFromWsTileList(List<rummikub.client.ws.Tile> serieToAdd) {
+        Serie serie = new Serie();
+        for (rummikub.client.ws.Tile tile : serieToAdd) {
+            serie.addSpecificTileToSerie(convertWsTileToLogicTile(tile));
+        }
+        return serie;
     }
 }

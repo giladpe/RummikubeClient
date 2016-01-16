@@ -184,11 +184,12 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     }
 
     @FXML
-    public synchronized void joinButtonClicked() {
+    public void joinButtonClicked() {
+        
         Platform.runLater(() -> (this.joinButton.setDisable(true)));
         String gameName = this.gamesTableView.getSelectionModel().getSelectedItem().getName();
         String playerName = this.playerNameInput.getText();
-
+        this.playerNameInput.clear();
         Thread t = new Thread(() -> {
             try {
                 initPlayScren(gameName, playerName);
@@ -431,7 +432,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     private void initPlayScren(String gameName, String playerName) throws DuplicateGameName_Exception, GameDoesNotExists_Exception, InvalidParameters_Exception {
         
-        this.playerID = (rummikubWebService.joinGame(gameName, playerName));
+        this.playerID = rummikubWebService.joinGame(gameName, playerName);
         PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
         PlayerDetails myDetails = rummikubWebService.getPlayerDetails(playerID);
         gameScreen.initWsSetting(service, gameName, playerID, myDetails);
