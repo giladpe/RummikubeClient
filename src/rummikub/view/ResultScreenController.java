@@ -29,30 +29,29 @@ public class ResultScreenController implements Initializable, ControlledScreen {
     //FXML methods
     @FXML
     private void handleMainMenuButtonAction(ActionEvent event) {
-         this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID,(PlayScreenController)myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID));
+  //       this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID,(PlayScreenController)myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID));
     }
 
     @FXML
     private void handleRestartGameButtonAction(ActionEvent event) {
-        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        gameScreen.createNewGame(new Settings(gameScreen.getRummikubLogic().getGameOriginalInputedSettings()));
-        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
-        Platform.runLater(gameScreen::initAllGameComponents);
-        //gameScreen.initAllGameComponents();
+//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+//        gameScreen.createNewGame(new Settings(gameScreen.getRummikubLogic().getGameOriginalInputedSettings()));
+//        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
+//        Platform.runLater(gameScreen::initAllGameComponents);
     }
 
     //Public methods
 
     public void updatedGameResultMsg() {
-        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        
-        if(gameScreen.getRummikubLogic().isGameOver() && !gameScreen.getRummikubLogic().isTie()) {
-            this.resultMsg.setText(Utils.Constants.QuestionsAndMessagesToUser.WINNER_IS + 
-                                   Utils.Constants.END_LINE + gameScreen.getRummikubLogic().getWinner().getName());
-        }
-        else {
-            this.resultMsg.setText(Utils.Constants.QuestionsAndMessagesToUser.TIE);
-        }
+//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+//        
+//        if(gameScreen.getRummikubLogic().isGameOver() && !gameScreen.getRummikubLogic().isTie()) {
+//            this.resultMsg.setText(Utils.Constants.QuestionsAndMessagesToUser.WINNER_IS + 
+//                                   Utils.Constants.END_LINE + gameScreen.getRummikubLogic().getWinner().getName());
+//        }
+//        else {
+//            this.resultMsg.setText(Utils.Constants.QuestionsAndMessagesToUser.TIE);
+//        }
     }
 
     @Override

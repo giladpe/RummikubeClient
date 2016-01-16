@@ -88,7 +88,7 @@ public class GameParametersController implements Initializable, ControlledScreen
 
     @FXML
     protected void handleBackToMenuButtonAction(ActionEvent event) {
-        this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID,this);
+       // this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID,this);
         //resetScreen();
     }
 
@@ -147,10 +147,10 @@ public class GameParametersController implements Initializable, ControlledScreen
         ArrayList<String> playersNamesList = getPlayersTextFieldList();
         PlayScreenController gameScreen = (PlayScreenController)this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
         this.gameSettings = new Settings(gameNameString,numOfPlayers, numOfComputerPlayers, playersNamesList);
-        gameScreen.createNewGame(gameSettings);
+    //    gameScreen.createNewGame(gameSettings);
         
         this.myController.setScreen(Rummikub.PLAY_SCREEN_ID,ScreensController.NOT_RESETABLE);
-        Platform.runLater(gameScreen::initAllGameComponents);
+      //  Platform.runLater(gameScreen::initAllGameComponents);
     }
     
     // Private methods:

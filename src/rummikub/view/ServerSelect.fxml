@@ -34,15 +34,7 @@
   </rowConstraints>
    <children>
       <Text id="GamesSettings-text" strokeType="OUTSIDE" strokeWidth="0.0" text="GamesSettings" textAlignment="CENTER" wrappingWidth="385.328125" GridPane.columnIndex="1" />
-      <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleBackToMenuButtonAction" prefHeight="52.0" prefWidth="141.0" text="Back to menu" GridPane.columnIndex="1" GridPane.rowIndex="9">
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <GridPane.margin>
-            <Insets left="25.0" />
-         </GridPane.margin>
-      </Button>
-      <Button fx:id="StartPlayingButton" alignment="CENTER" contentDisplay="CENTER" disable="true" layoutX="35.0" layoutY="366.0" mnemonicParsing="false" onAction="#handleStartPlayingButtonAction" prefHeight="52.0" prefWidth="141.0" text="Start Playing" GridPane.columnIndex="2" GridPane.rowIndex="9">
+      <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleBackToMenuButtonAction" prefHeight="52.0" prefWidth="135.0" text="Back to menu" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="CENTER">
          <opaqueInsets>
             <Insets />
          </opaqueInsets>

@@ -34,52 +34,51 @@ public class SubMenuController implements Initializable, ControlledScreen {
 
     @FXML
     private void handlePlayerQuitButtonAction(ActionEvent event) {
-        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        gameScreen.getRummikubLogic().removeCurrentPlayerFromTheGame();
-        
-        if (!gameScreen.getRummikubLogic().isGameOver()) {
-            gameScreen.swapTurns();
-        }
-        
-        if (isGameOver(gameScreen)) {
-            //gameScreen.initAllGameComponents();
-            Platform.runLater(gameScreen::initAllGameComponents);
-            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
-        }
-        else {
-            ResultScreenController resultScreen = (ResultScreenController) this.myController.getControllerScreen(Rummikub.RESULT_SCREEN_ID);
-            resultScreen.updatedGameResultMsg();
-            this.myController.setScreen(Rummikub.RESULT_SCREEN_ID, gameScreen);
-        }
+//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+//        gameScreen.getRummikubLogic().removeCurrentPlayerFromTheGame();
+//        
+//        if (!gameScreen.getRummikubLogic().isGameOver()) {
+//            gameScreen.swapTurns();
+//        }
+//        
+//        if (isGameOver(gameScreen)) {
+//            //gameScreen.initAllGameComponents();
+//            Platform.runLater(gameScreen::initAllGameComponents);
+//            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
+//        }
+//        else {
+//            ResultScreenController resultScreen = (ResultScreenController) this.myController.getControllerScreen(Rummikub.RESULT_SCREEN_ID);
+//            resultScreen.updatedGameResultMsg();
+//            this.myController.setScreen(Rummikub.RESULT_SCREEN_ID, gameScreen);
+//        }
     }
 
     @FXML
     private void handleRestartGameButtonAction(ActionEvent event) {
-        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        gameScreen.createNewGame( new Settings(gameScreen.getRummikubLogic().getGameOriginalInputedSettings()));
-        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
-        Platform.runLater(gameScreen::initAllGameComponents);
-        //gameScreen.initAllGameComponents();
+//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+//        gameScreen.createNewGame( new Settings(gameScreen.getRummikubLogic().getGameOriginalInputedSettings()));
+//        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
+//        Platform.runLater(gameScreen::initAllGameComponents);
     }
 
     @FXML
     private void handleResumeGameButtonAction(ActionEvent event) {
         PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        gameScreen.showCurrentGameBoardAndCurrentPlayerHand();
+        //gameScreen.showCurrentGameBoardAndCurrentPlayerHand();
         this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 
     @FXML
     private void handleExitToMainMenuButtonAction(ActionEvent event) {
-        this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, (PlayScreenController) myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID));
+        //this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, (PlayScreenController) myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID));
     }
     
     //private methods
     
-    private boolean isGameOver(PlayScreenController gameScreen) {
-        return !(gameScreen.getRummikubLogic().isGameOver() || gameScreen.getRummikubLogic().isOnlyOnePlayerLeft() || !gameScreen.getRummikubLogic().isHumanPlayerLeftInGame());
-    }
-    
+//    private boolean isGameOver(PlayScreenController gameScreen) {
+////        return !(gameScreen.getRummikubLogic().isGameOver() || gameScreen.getRummikubLogic().isOnlyOnePlayerLeft() || !gameScreen.getRummikubLogic().isHumanPlayerLeftInGame());
+//    }
+//    
     //Public methods
     @Override
     public void initialize(URL url, ResourceBundle rb) { }

@@ -12,8 +12,8 @@ import rummikub.view.ScreensController;
 public class Rummikub extends Application {
 
     //Constants:
-    public static final String MAINMENU_SCREEN_ID = "mainMenu";
-    public static final String MAINMENU_SCREEN_FXML = "MainMenu.fxml";
+   // public static final String MAINMENU_SCREEN_ID = "mainMenu";
+   // public static final String MAINMENU_SCREEN_FXML = "MainMenu.fxml";
 
     public static final String GAME_PARAMETERS_SCREEN_ID = "gameParameters";
     public static final String GAME_PARAMETERS_FXML = "GameParameters.fxml";
@@ -44,7 +44,6 @@ public class Rummikub extends Application {
         screensController.loadScreen(SUBMENU_SCREEN_ID, SUBMENU_SCREEN_FXML);
         screensController.loadScreen(RESULT_SCREEN_ID, RESULT_SCREEN_FXML);
         screensController.loadScreen(SERVER_SELECT_SCREEN_ID, SERVER_SELECT_SCREEN_FXML);
-        
         screensController.setScreen(LOGIN_SCREEN_ID, ScreensController.NOT_RESETABLE);
         StackPane root = new StackPane();
         root.getChildren().addAll(screensController);

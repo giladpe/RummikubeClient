@@ -46,6 +46,7 @@ import rummikub.client.ws.DuplicateGameName_Exception;
 import rummikub.client.ws.GameDetails;
 import rummikub.client.ws.GameDoesNotExists_Exception;
 import rummikub.client.ws.InvalidParameters_Exception;
+import rummikub.client.ws.PlayerDetails;
 import rummikub.client.ws.RummikubWebService;
 import rummikub.client.ws.RummikubWebServiceService;
 import rummikubFX.Rummikub;
@@ -74,6 +75,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     private int playerID;
     //may not need : private SimpleBooleanProperty isServerSelectSceeneShow;
     private Timer timer;
+    private static final boolean DAEMON_THREAD = true;
 
     public RummikubWebServiceService getService() {
         return service;
@@ -81,8 +83,6 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     @FXML
     private GridPane GamesSettings;
-    @FXML
-    private Button StartPlayingButton;
     @FXML
     private Label errorMsg;
     @FXML
@@ -115,7 +115,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     @FXML
     private void handleBackToMenuButtonAction(ActionEvent event) {
-        this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, this);
+        this.myController.setScreen(Rummikub.LOGIN_SCREEN_ID, this);
     }
 
     @FXML
@@ -163,61 +163,46 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     @FXML
     public void addButtonClicked() {
-        new Thread(() -> {
+        
+        Platform.runLater(() -> (this.addButton.setDisable(true)));
+        String gameName = gameNameInput.getText();
+        String playerName = this.playerNameInput.getText();
+        Thread t = new Thread(() -> {
             try {
-                rummikubWebService.createGame(gameNameInput.getText(), getNumOfHumansPlayers(), getNumOfComputerPlayers());
-                this.setPlayerId(rummikubWebService.joinGame(gameNameInput.getText(), playerNameInput.getText()));
-                ObservableList<GameDetails> gameList = getListOfWaittingGames();
-                Platform.runLater(() -> {
-                    gamesTableView.setItems(gameList);
-
-                });
-                PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-                gameScreen.setService(service);
-                gameScreen.setPlayerId(playerID);
-                gameScreen.initButtons(true);
-                this.timer.cancel();
-                gameScreen.getEvents();
-                this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
-                //Platform.runLater(gameScreen::initAllGameComponents);
-
-            } catch (DuplicateGameName_Exception ex) {
-                Platform.runLater(() -> showErrorMsg(errorMsg, ex.getMessage()));
-            } catch (InvalidParameters_Exception | GameDoesNotExists_Exception ex) {
+                rummikubWebService.createGame(getPlayerName(), getNumOfHumansPlayers(), getNumOfComputerPlayers());
+                initPlayScren(gameName, playerName);
+            } catch (DuplicateGameName_Exception | GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
                 Platform.runLater(() -> {
                     showErrorMsg(errorMsg, ex.getMessage());
+                    Platform.runLater(() -> (clearInputFiled()));
                 });
             }
-            Platform.runLater(() -> (clearInputFiled()));
-        }).start();
+        });
+        t.setDaemon(DAEMON_THREAD);
+        t.start();
+
     }
 
     @FXML
-    public synchronized void joinButtonClicked() {
-        new Thread(() -> {
+    public void joinButtonClicked() {
+        
+        Platform.runLater(() -> (this.joinButton.setDisable(true)));
+        String gameName = this.gamesTableView.getSelectionModel().getSelectedItem().getName();
+        String playerName = this.playerNameInput.getText();
+        this.playerNameInput.clear();
+        Thread t = new Thread(() -> {
             try {
-                String playerName=this.playerNameInput.getText();
-                String gameName=this.gamesTableView.getSelectionModel().getSelectedItem().getName();
-                int id=rummikubWebService.joinGame(gameName,playerName );
-                setPlayerId(id);
-                PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-                gameScreen.setService(service);
-                gameScreen.setPlayerId(playerID);
-                gameScreen.initButtons(true);
-                this.timer.cancel();
-                gameScreen.getEvents();
-                this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
-                //Platform.runLater(gameScreen::initAllGameComponents);
-                //////TODO 
-            } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
+                initPlayScren(gameName, playerName);
+            } catch (DuplicateGameName_Exception | GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
                 Platform.runLater(() -> {
                     showErrorMsg(errorMsg, ex.getMessage());
+                    clearInputFiled();
                 });
             }
-            Platform.runLater(() -> {
-                this.gamesTableView.getSelectionModel().clearSelection();
-            });
-        }).start();
+        });
+        t.setDaemon(
+                this.DAEMON_THREAD);
+        t.start();
     }
 
     private synchronized ObservableList<GameDetails> getListOfWaittingGames() {
@@ -428,13 +413,31 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 //        }
 
     public void initGameViewTable() {
+
         new Thread(() -> {
             ObservableList<GameDetails> gameList = getListOfWaittingGames();
             Platform.runLater(() -> {
-                gamesTableView.getItems().clear();////////////
+                int index = gamesTableView.getSelectionModel().getSelectedIndex();
                 gamesTableView.setItems(gameList);
+                if (index >= 0) {
+                    gamesTableView.getSelectionModel().select(index);
+                }
             });
         }).start();
+    }
+
+    private String getPlayerName() {
+        return gameNameInput.getText();
+    }
+
+    private void initPlayScren(String gameName, String playerName) throws DuplicateGameName_Exception, GameDoesNotExists_Exception, InvalidParameters_Exception {
+        
+        this.playerID = rummikubWebService.joinGame(gameName, playerName);
+        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+        PlayerDetails myDetails = rummikubWebService.getPlayerDetails(playerID);
+        gameScreen.initWsSetting(service, gameName, playerID, myDetails);
+        this.timer.cancel();
+        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 }
 

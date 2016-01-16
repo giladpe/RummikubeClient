@@ -56,7 +56,7 @@ public class SaveGameMenuController implements Initializable, ControlledScreen, 
             new Thread(() -> { saveGame(); }).start();
         }
         catch (Exception ex) {
-            this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
+        //    this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
         }
         Platform.runLater(() -> { enableOrDisableButtonsControls(ENABLED); });
         this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
@@ -77,7 +77,7 @@ public class SaveGameMenuController implements Initializable, ControlledScreen, 
                 new Thread(() -> { saveAsGame(file.getPath()); }).start();
             }
             catch (Exception ex) {
-                this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
+            //    this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
             }
         }
         Platform.runLater(() -> { enableOrDisableButtonsControls(ENABLED); });
@@ -111,44 +111,44 @@ public class SaveGameMenuController implements Initializable, ControlledScreen, 
 
     //Private methods
     private void saveAsGame(String filePath) {
-        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        boolean succedSavingFile = false;
-        GameLogic rummikubLogic = gameScreen.getRummikubLogic();
-
-        try {
-            succedSavingFile = JaxBXmlParser.saveAsSettingsToXml(filePath, rummikubLogic.getPlayers(),
-                    rummikubLogic.getGameBoard(),
-                    rummikubLogic.getGameSettings().getGamesName(),
-                    rummikubLogic.getCurrentPlayer().getName());
-        } 
-        catch (SAXException | JAXBException | IOException ex) {
-            succedSavingFile = false;
-        } 
-        finally {
-            final boolean saveResult = succedSavingFile;
-            Platform.runLater(() -> { handleMsg(saveResult); });
-        }
+//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+//        boolean succedSavingFile = false;
+//        GameLogic rummikubLogic = gameScreen.getRummikubLogic();
+//
+//        try {
+//            succedSavingFile = JaxBXmlParser.saveAsSettingsToXml(filePath, rummikubLogic.getPlayers(),
+//                    rummikubLogic.getGameBoard(),
+//                    rummikubLogic.getGameSettings().getGamesName(),
+//                    rummikubLogic.getCurrentPlayer().getName());
+//        } 
+//        catch (SAXException | JAXBException | IOException ex) {
+//            succedSavingFile = false;
+//        } 
+//        finally {
+//            final boolean saveResult = succedSavingFile;
+//            Platform.runLater(() -> { handleMsg(saveResult); });
+//        }
     }
 
     private void saveGame() {
-        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        boolean succedSavingFile = false;
-        GameLogic rummikubLogic = gameScreen.getRummikubLogic();
-                
-        try {
-            succedSavingFile = JaxBXmlParser.saveSettingsToXml(rummikubLogic.getPlayers(),
-                                                               rummikubLogic.getGameBoard(),
-                                                               rummikubLogic.getGameSettings().getGamesName(),
-                                                               rummikubLogic.getCurrentPlayer().getName());
-
-        } catch (SAXException | JAXBException | IOException ex) {
-            succedSavingFile = false;
-        } 
-        finally {
-            final boolean saveResult = succedSavingFile;
-            Platform.runLater(() -> { handleMsg(saveResult); });
-            Thread.currentThread().stop();
-        }
+//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+//        boolean succedSavingFile = false;
+//        GameLogic rummikubLogic = gameScreen.getRummikubLogic();
+//                
+//        try {
+//            succedSavingFile = JaxBXmlParser.saveSettingsToXml(rummikubLogic.getPlayers(),
+//                                                               rummikubLogic.getGameBoard(),
+//                                                               rummikubLogic.getGameSettings().getGamesName(),
+//                                                               rummikubLogic.getCurrentPlayer().getName());
+//
+//        } catch (SAXException | JAXBException | IOException ex) {
+//            succedSavingFile = false;
+//        } 
+//        finally {
+//            final boolean saveResult = succedSavingFile;
+//            Platform.runLater(() -> { handleMsg(saveResult); });
+//            Thread.currentThread().stop();
+//        }
     }
     
     private void enableOrDisableButtonsControls(boolean state) {
