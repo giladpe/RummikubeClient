@@ -42,7 +42,7 @@
             <Insets left="10.0" right="10.0" />
          </opaqueInsets>
          <GridPane.margin>
-            <Insets left="110.0" right="10.0" />
+            <Insets left="125.0" right="10.0" />
          </GridPane.margin></TextField>
       <Text id="GamesSettings-text" strokeType="OUTSIDE" strokeWidth="0.0" text="Log In To Server" textAlignment="CENTER" wrappingWidth="385.328125" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <Button fx:id="exit" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleExitButtonAction" prefHeight="52.0" prefWidth="141.0" text="Exit" GridPane.columnIndex="1" GridPane.rowIndex="9">
@@ -73,7 +73,7 @@
                   <Insets />
                </opaqueInsets>
                <HBox.margin>
-                  <Insets />
+                  <Insets left="15.0" />
                </HBox.margin>
             </TextField>
          </children>

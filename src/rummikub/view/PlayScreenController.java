@@ -4,7 +4,6 @@
 package rummikub.view;
 
 import java.awt.Point;
-import java.net.ConnectException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,8 +11,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -87,7 +84,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private static final String PLAYER_RESIGNED = " decided to quite";
     private static final String PLAYER_DONE = " done is Turn";
     private static final String GAME_OVER="Game Is Over";
-    Timer timer;
+    private Timer timer;
     private final ArrayList<Label> playersLabelsList = new ArrayList<>();
     private ScreensController myController;
     //private GameLogic rummikubLogic = new GameLogic();
