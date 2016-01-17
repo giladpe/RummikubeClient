@@ -27,7 +27,6 @@ public class ResultScreenController implements Initializable, ControlledScreen {
     private Button Exit;
 
     //FXML methods
-    
 
 
     //Public methods
@@ -57,5 +56,4 @@ public class ResultScreenController implements Initializable, ControlledScreen {
     private void closeGameAppScene(ActionEvent event) {
         (((Node) event.getSource()).getScene().getWindow()).hide();
     }
-
 }
