@@ -894,6 +894,9 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         int sourceSerie = event.getSourceSequenceIndex();
         int targetSerie = event.getTargetSequenceIndex();
         int targetPosition = event.getTargetSequencePosition();
+        if(this.logicBoard.getListOfSerie().size()==targetSerie){
+            this.logicBoard.addSeries(new Serie());
+        }
         Serie fromSerie = this.logicBoard.getSeries(sourceSerie);
         Serie toSerie = this.logicBoard.getSeries(targetSerie);
         Tile tile = fromSerie.getSpecificTile(sourcePosition);
