@@ -35,12 +35,12 @@
       </ImageView>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="40.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
          <children>
-            <Button fx:id="mainMenu" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleMainMenuButtonAction" prefHeight="60.0" prefWidth="160.0" text="Main Menu" textAlignment="CENTER">
+            <Button fx:id="gameSelect" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleGameSelectButtonAction" prefHeight="60.0" prefWidth="160.0" text="Game Select" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="restartGame" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleRestartGameButtonAction" prefHeight="60.0" prefWidth="160.0" text="Restart Game" textAlignment="CENTER">
+            <Button fx:id="Exit" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleExitButtonAction" prefHeight="60.0" prefWidth="160.0" text="Exit" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>

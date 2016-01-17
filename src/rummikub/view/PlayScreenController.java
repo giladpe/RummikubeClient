@@ -11,10 +11,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -163,7 +161,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     @FXML
     private void handleEndTrunAction(ActionEvent event) {
-        Thread t = new Thread(() -> {
+        Thread thread = new Thread(() -> {
             try {
                 this.rummikubWebService.finishTurn(playerID);
             } catch (InvalidParameters_Exception ex) {
@@ -171,8 +169,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 Platform.runLater(() -> showGameMsg(errorMsg, ex.getMessage()));
             }
         });
-        t.setDaemon(DAEMON_THREAD);
-        t.start();
+        thread.setDaemon(DAEMON_THREAD);
+        thread.start();
     }
 
     public void getRummikubeWsEvents() {
@@ -526,8 +524,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     private void onGameFinished() {
-        ResultScreenController resultScreen = (ResultScreenController) this.myController.getControllerScreen(Rummikub.RESULT_SCREEN_ID);
-        resultScreen.updatedGameResultMsg();
         this.myController.setScreen(Rummikub.RESULT_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 
@@ -615,8 +611,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
         switch (event.getType()) {
             case GAME_OVER: {
-                handleGameOverEven(event);//todo
-                
+                handleGameOverEven(event);
                 break;
             }
             case GAME_START: {
@@ -624,7 +619,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 break;
             }
             case GAME_WINNER: {
-                handleGameWinnerEvent(event);//todo
+                handleGameWinnerEvent(event);
                 break;
             }
             case PLAYER_FINISHED_TURN: {
@@ -803,8 +798,9 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     private void handleGameWinnerEvent(Event event) {
+        ResultScreenController resultScreenController =(ResultScreenController) this.myController.getControllerScreen(Rummikub.RESULT_SCREEN_ID);
+        resultScreenController.updatedGameResultMsg(event.getPlayerName());
     }
-
     private void handlePlayerFinishedTurnEvent(Event event) {
         Platform.runLater(() -> {
             showPlayerHandWs();
