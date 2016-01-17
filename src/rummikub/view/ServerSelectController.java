@@ -248,7 +248,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     public void resetScreen() {
         initGameViewTable();
         initGameViewTableTimer();
-
+        clearInputFiled();
 //        new Thread(() -> {
 //            ObservableList<GameDetails> gameList = getListOfWaittingGames();
 //            Platform.runLater(() -> {

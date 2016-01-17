@@ -9,76 +9,37 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import rummikub.client.ws.RummikubWebService;
+import rummikub.client.ws.RummikubWebServiceService;
 import rummikub.gameLogic.model.logic.Settings;
 import rummikubFX.Rummikub;
 
-public class SubMenuController implements Initializable, ControlledScreen {
+public class SubMenuController implements Initializable, ControlledScreen,ServerConnection {
 
-    //Private FXML methods
-    @FXML private Button saveGame;
-    @FXML private Button restartGame;
     @FXML private Button resumeGame;
-    @FXML private Button exitToMainMenu;
-    @FXML private Button playerQuit;
     
     //Private methods
     private ScreensController myController;
-
-    //Private FXML methods
     @FXML
-    private void handleSaveGameButtonAction(ActionEvent event) {
-        SaveGameMenuController saveScreen = (SaveGameMenuController) this.myController.getControllerScreen(Rummikub.SAVE_GAME_SCREEN_ID);
-        this.myController.setScreen(Rummikub.SAVE_GAME_SCREEN_ID, saveScreen);
-    }
-
+    private Button ResignedGame;
     @FXML
-    private void handlePlayerQuitButtonAction(ActionEvent event) {
-//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-//        gameScreen.getRummikubLogic().removeCurrentPlayerFromTheGame();
-//        
-//        if (!gameScreen.getRummikubLogic().isGameOver()) {
-//            gameScreen.swapTurns();
-//        }
-//        
-//        if (isGameOver(gameScreen)) {
-//            //gameScreen.initAllGameComponents();
-//            Platform.runLater(gameScreen::initAllGameComponents);
-//            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
-//        }
-//        else {
-//            ResultScreenController resultScreen = (ResultScreenController) this.myController.getControllerScreen(Rummikub.RESULT_SCREEN_ID);
-//            resultScreen.updatedGameResultMsg();
-//            this.myController.setScreen(Rummikub.RESULT_SCREEN_ID, gameScreen);
-//        }
-    }
+    private Button Exit;
+    private RummikubWebServiceService service;
+    private RummikubWebService rummikubWebService;
+    private int playerID;
 
-    @FXML
-    private void handleRestartGameButtonAction(ActionEvent event) {
-//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-//        gameScreen.createNewGame( new Settings(gameScreen.getRummikubLogic().getGameOriginalInputedSettings()));
-//        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
-//        Platform.runLater(gameScreen::initAllGameComponents);
-    }
+
+
 
     @FXML
     private void handleResumeGameButtonAction(ActionEvent event) {
-        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        //gameScreen.showCurrentGameBoardAndCurrentPlayerHand();
         this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 
-    @FXML
-    private void handleExitToMainMenuButtonAction(ActionEvent event) {
-        //this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, (PlayScreenController) myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID));
-    }
     
-    //private methods
     
-//    private boolean isGameOver(PlayScreenController gameScreen) {
-////        return !(gameScreen.getRummikubLogic().isGameOver() || gameScreen.getRummikubLogic().isOnlyOnePlayerLeft() || !gameScreen.getRummikubLogic().isHumanPlayerLeftInGame());
-//    }
-//    
     //Public methods
     @Override
     public void initialize(URL url, ResourceBundle rb) { }
@@ -86,5 +47,41 @@ public class SubMenuController implements Initializable, ControlledScreen {
     @Override
     public void setScreenParent(ScreensController parentScreen) {
         this.myController = parentScreen;
+    }
+
+    @FXML
+    private void handlePlayerResignedGameButtonAction(ActionEvent event) {
+        PlayScreenController gameScene;
+        gameScene = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+        this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameScene);
+    }
+
+    @FXML
+    private void handleExitButtonAction(ActionEvent event) {
+            closeGameAppScene(event);
+    }
+    private void closeGameAppScene(ActionEvent event) {
+        (((Node) event.getSource()).getScene().getWindow()).hide();
+    }
+
+    @Override
+    public void setService(RummikubWebServiceService service) {
+        this.service = service;
+        this.rummikubWebService = service.getRummikubWebServicePort();
+    }
+
+    @Override
+    public void setPlayerId(int playerId) {
+        this.playerID = playerId;
+    }
+
+    @Override
+    public int getPlayerId() {
+        return this.playerID;
+    }
+
+    @Override
+    public RummikubWebServiceService getService() {
+        return service;
     }
 }

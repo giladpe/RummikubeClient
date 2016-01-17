@@ -14,6 +14,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -29,7 +30,7 @@ import rummikubFX.Rummikub;
  *
  * @author giladPe
  */
-public class LogInController implements Initializable, ControlledScreen, ResetableScreen,ServerConnection {
+public class LogInController implements Initializable, ControlledScreen, ResetableScreen {
 
     @FXML
     private GridPane GamesSettings;
@@ -107,31 +108,16 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
 
     @FXML
     private void handleExitButtonAction(ActionEvent event) {
+            closeGameAppScene(event);
     }
-
+    private void closeGameAppScene(ActionEvent event) {
+        (((Node) event.getSource()).getScene().getWindow()).hide();
+    }
     @FXML
     private void handleServrtPortTextChange(ActionEvent event) {
     }
 
-    @Override
-    public void setService(RummikubWebServiceService service) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void setPlayerId(int playerId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int getPlayerId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public RummikubWebServiceService getService() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
 }
 
 // <editor-fold defaultstate="collapsed" desc="Web service Info">
