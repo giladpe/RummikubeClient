@@ -175,7 +175,8 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     }
 
     public static void CreateXMLDoc( String root, String elements, String[] children) throws TransformerConfigurationException {
-        File dir = new File("resources/fileProg.xml");
+        String workingDir = System.getProperty("user.dir");
+        File dir = new File(workingDir+"resources/fileProg.xml");
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
