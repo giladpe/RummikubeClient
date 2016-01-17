@@ -40,6 +40,7 @@ public class Rummikub extends Application {
     public void start(Stage primaryStage) {
         
         primaryStage.setOnCloseRequest((WindowEvent event) -> {
+            
             Platform.exit();
             System.exit(0);
         });
