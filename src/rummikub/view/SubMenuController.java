@@ -5,12 +5,15 @@ package rummikub.view;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import rummikub.client.ws.InvalidParameters_Exception;
 import rummikub.client.ws.RummikubWebService;
 import rummikub.client.ws.RummikubWebServiceService;
 import rummikub.gameLogic.model.logic.Settings;
@@ -35,6 +38,11 @@ public class SubMenuController implements Initializable, ControlledScreen,Server
 
     @FXML
     private void handleResumeGameButtonAction(ActionEvent event) {
+        try {
+            this.rummikubWebService.resign(playerID);
+        } catch (InvalidParameters_Exception ex) {
+            ///todo
+        }
         this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 

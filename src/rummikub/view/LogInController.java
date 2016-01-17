@@ -18,8 +18,10 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.io.File;
+import java.io.InputStream;
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -69,7 +71,13 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     private CheckBox changeServerCheckBox;
     private String addressF;
     private String portF;
-    private String RUMMIKUB_API = "/RummikubApi/RummikubWebServiceService?wsdl";
+    public static final String RUMMIKUB_API = "/RummikubApi/RummikubWebServiceService?wsdl";
+    public static final String RESOURCES_FOLDER = "./src/resources/";
+    public static final String CONIGURATION_FILE = "serverConfig.xml";
+    private static final String ROOT_ELEMENT = "serverUrl";
+    private static final String ADDRESS_ELEMENT = "address";
+    private static final String PORT_ELEMENT = "port";
+    private static final String HTTP = "http://";
 
     /**
      * Initializes the controller class.
@@ -78,13 +86,14 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     public void initialize(URL url, ResourceBundle rb) {
         //this.address.setText("http://localhost");
         //this.port.setText("8080");
-        this.addressF = "";
-        this.portF = "";
+
         this.address.setDisable(true);
         this.port.setDisable(true);
         try {
             getAddressFromFile();
-        } catch (SAXException | IOException | ParserConfigurationException ex) {
+            this.address.setText(addressF);
+            this.port.setText(portF);
+        } catch (Exception ex) {
             this.address.setDisable(false);
             this.port.setDisable(false);
         }
@@ -111,15 +120,13 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
             //create a URL
             //URL location = new URL( address.getText() + ":" + port.getText() + "/RummikubApi/RummikubWebServiceService?wsdl");
             if (!address.isDisable()) {
-                String[] urlAttribute = { this.address.getText(),this.port.getText() };
-                
-                try {
-                    CreateXMLDoc("serverUrl","url",urlAttribute);
-                } catch (TransformerConfigurationException ex) {
-                    Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                this.addressF=this.address.getText();
+                this.portF=this.port.getText();
+                String[] urlAttribute = {this.addressF,portF};
+                String[] elements = {ADDRESS_ELEMENT, PORT_ELEMENT};
+                CreateXMLDoc(ROOT_ELEMENT, elements, urlAttribute);
             }
-            URL location = new URL(addressF + ":" + portF + RUMMIKUB_API);
+            URL location = new URL(HTTP + addressF + ":" + portF + RUMMIKUB_API);
             //create a new service with the URL
             ServerSelectController gameSeettingsScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
             this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSeettingsScene);
@@ -128,27 +135,31 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
             resetScreen();
         } catch (MalformedURLException ex) {
             this.errorMsg.setText("Invalid Url");/////to change
+        } catch (TransformerConfigurationException ex) {
+            this.errorMsg.setText("Can not create file");
+        } catch (Exception ex) {
+            this.errorMsg.setText("Can not create file");
         }
         //ServerSelectController gameSeettingsScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
         //    this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSeettingsScene);
         //    resetScreen();
-
+        
     }
 
     private void getAddressFromFile() throws SAXException, IOException, ParserConfigurationException {
-        File fXmlFile = new File("resources/configuration.xml");
+        File fXmlFile = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(fXmlFile);
         //optional, but recommended
         //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
         doc.getDocumentElement().normalize();
-        NodeList nList = doc.getElementsByTagName("url");
+        NodeList nList = doc.getElementsByTagName(ROOT_ELEMENT);
         Node nNode = nList.item(0);
         if (nNode.getNodeType() == Node.ELEMENT_NODE) {
             Element eElement = (Element) nNode;
-            this.addressF = eElement.getElementsByTagName("address").item(0).getTextContent();
-            this.portF = eElement.getElementsByTagName("port").item(0).getTextContent();
+            this.addressF = eElement.getElementsByTagName(ADDRESS_ELEMENT).item(0).getTextContent();
+            this.portF = eElement.getElementsByTagName(PORT_ELEMENT).item(0).getTextContent();
         }
     }
 
@@ -174,27 +185,30 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     private void handleServrtPortTextChange(ActionEvent event) {
     }
 
-    public static void CreateXMLDoc( String root, String elements, String[] children) throws TransformerConfigurationException {
-        String workingDir = System.getProperty("user.dir");
-        File dir = new File(workingDir+"resources/fileProg.xml");
+    public static void CreateXMLDoc(String root, String[] elements, String[] children) throws TransformerConfigurationException {
+
+        File dir = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
+
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document doc = docBuilder.newDocument();
             Element rootElement = doc.createElement(root);
             doc.appendChild(rootElement);
-            Element element = doc.createElement(elements);
+
             for (int i = 0; i < children.length; i++) {
+                Element element = doc.createElement(elements[i]);
                 element.appendChild(doc.createTextNode(children[i]));
+                rootElement.appendChild(element);
+
             }
-            rootElement.appendChild(element);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
-           
-            
+
             StreamResult result = new StreamResult(dir);
             transformer.transform(source, result);
+            
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
         } catch (TransformerException tfe) {
