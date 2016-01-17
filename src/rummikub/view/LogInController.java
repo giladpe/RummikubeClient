@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -78,6 +79,7 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     private static final String ADDRESS_ELEMENT = "address";
     private static final String PORT_ELEMENT = "port";
     private static final String HTTP = "http://";
+    private static final boolean DAEMON_THREAD = true;
 
     /**
      * Initializes the controller class.
@@ -89,18 +91,16 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
 
         this.address.setDisable(true);
         this.port.setDisable(true);
-        try {
-            getAddressFromFile();
-            this.address.setText(addressF);
-            this.port.setText(portF);
-        } catch (Exception ex) {
-            this.address.setDisable(false);
-            this.port.setDisable(false);
-        }
+        this.address.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
+            addressF = this.address.getText();
+        });
+        this.port.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
+            this.portF = this.port.getText();
+        });
+        getAddressFromFile();
         changeServerCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) -> {
             initServerChanges(new_val);
         });
-// TODO
     }
 
     @Override
@@ -120,47 +120,49 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
             //create a URL
             //URL location = new URL( address.getText() + ":" + port.getText() + "/RummikubApi/RummikubWebServiceService?wsdl");
             if (!address.isDisable()) {
-                this.addressF=this.address.getText();
-                this.portF=this.port.getText();
-                String[] urlAttribute = {this.addressF,portF};
+                String[] urlAttribute = {this.addressF, portF};
                 String[] elements = {ADDRESS_ELEMENT, PORT_ELEMENT};
                 CreateXMLDoc(ROOT_ELEMENT, elements, urlAttribute);
             }
             URL location = new URL(HTTP + addressF + ":" + portF + RUMMIKUB_API);
-            //create a new service with the URL
             ServerSelectController gameSeettingsScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
-            this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSeettingsScene);
             gameSeettingsScene.setService(new RummikubWebServiceService(location));
             this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSeettingsScene);
             resetScreen();
         } catch (MalformedURLException ex) {
             this.errorMsg.setText("Invalid Url");/////to change
-        } catch (TransformerConfigurationException ex) {
-            this.errorMsg.setText("Can not create file");
         } catch (Exception ex) {
             this.errorMsg.setText("Can not create file");
         }
-        //ServerSelectController gameSeettingsScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
-        //    this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSeettingsScene);
-        //    resetScreen();
-        
     }
 
-    private void getAddressFromFile() throws SAXException, IOException, ParserConfigurationException {
-        File fXmlFile = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(fXmlFile);
-        //optional, but recommended
-        //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-        doc.getDocumentElement().normalize();
-        NodeList nList = doc.getElementsByTagName(ROOT_ELEMENT);
-        Node nNode = nList.item(0);
-        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-            Element eElement = (Element) nNode;
-            this.addressF = eElement.getElementsByTagName(ADDRESS_ELEMENT).item(0).getTextContent();
-            this.portF = eElement.getElementsByTagName(PORT_ELEMENT).item(0).getTextContent();
-        }
+    private void getAddressFromFile() {
+        Thread thread = new Thread(() -> {
+            try {
+                File fXmlFile = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(fXmlFile);
+                doc.getDocumentElement().normalize();
+                NodeList nList = doc.getElementsByTagName(ROOT_ELEMENT);
+                Node nNode = nList.item(0);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    this.addressF = eElement.getElementsByTagName(ADDRESS_ELEMENT).item(0).getTextContent();
+                    this.portF = eElement.getElementsByTagName(PORT_ELEMENT).item(0).getTextContent();
+                }
+                Platform.runLater(() -> {
+                    this.address.setText(addressF);
+                    this.port.setText(portF);
+                });
+            } catch (Exception ex) {
+                this.addressF = this.portF = "";
+                this.address.setDisable(false);
+                this.port.setDisable(false);
+            }
+        });
+        thread.setDaemon(DAEMON_THREAD);
+        thread.start();
     }
 
     private void initServerChanges(Boolean new_val) {
@@ -186,35 +188,35 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     }
 
     public static void CreateXMLDoc(String root, String[] elements, String[] children) throws TransformerConfigurationException {
+        Thread thread = new Thread(() -> {
+            try {
+                File dir = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
+                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+                Document doc = docBuilder.newDocument();
+                Element rootElement = doc.createElement(root);
+                doc.appendChild(rootElement);
 
-        File dir = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
+                for (int i = 0; i < children.length; i++) {
+                    Element element = doc.createElement(elements[i]);
+                    element.appendChild(doc.createTextNode(children[i]));
+                    rootElement.appendChild(element);
+                }
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
 
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.newDocument();
-            Element rootElement = doc.createElement(root);
-            doc.appendChild(rootElement);
+                StreamResult result = new StreamResult(dir);
+                transformer.transform(source, result);
 
-            for (int i = 0; i < children.length; i++) {
-                Element element = doc.createElement(elements[i]);
-                element.appendChild(doc.createTextNode(children[i]));
-                rootElement.appendChild(element);
-
+            } catch (ParserConfigurationException pce) {
+                pce.printStackTrace();
+            } catch (TransformerException tfe) {
+                tfe.printStackTrace();
             }
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(doc);
-
-            StreamResult result = new StreamResult(dir);
-            transformer.transform(source, result);
-            
-        } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
-        } catch (TransformerException tfe) {
-            tfe.printStackTrace();
-        }
-
+        });
+        thread.setDaemon(DAEMON_THREAD);
+        thread.start();
     }
 }
 // <editor-fold defaultstate="collapsed" desc="Web service Info">
