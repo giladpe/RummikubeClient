@@ -6,52 +6,33 @@ package rummikub.view;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import rummikub.gameLogic.model.logic.Settings;
-import rummikubFX.Rummikub;
 import rummikub.gameLogic.view.ioui.Utils;
+import rummikubFX.Rummikub;
 
 public class ResultScreenController implements Initializable, ControlledScreen {
 
-    //FXML members
-    @FXML private Button mainMenu;
-    @FXML private Button restartGame;
     @FXML private Label resultMsg;
     
     //Private members
     private ScreensController myController;
+    @FXML
+    private Button gameSelect;
+    @FXML
+    private Button Exit;
 
     //FXML methods
-    @FXML
-    private void handleMainMenuButtonAction(ActionEvent event) {
-  //       this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID,(PlayScreenController)myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID));
-    }
 
-    @FXML
-    private void handleRestartGameButtonAction(ActionEvent event) {
-//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-//        gameScreen.createNewGame(new Settings(gameScreen.getRummikubLogic().getGameOriginalInputedSettings()));
-//        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
-//        Platform.runLater(gameScreen::initAllGameComponents);
-    }
 
     //Public methods
 
-    public void updatedGameResultMsg() {
-//        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-//        
-//        if(gameScreen.getRummikubLogic().isGameOver() && !gameScreen.getRummikubLogic().isTie()) {
-//            this.resultMsg.setText(Utils.Constants.QuestionsAndMessagesToUser.WINNER_IS + 
-//                                   Utils.Constants.END_LINE + gameScreen.getRummikubLogic().getWinner().getName());
-//        }
-//        else {
-//            this.resultMsg.setText(Utils.Constants.QuestionsAndMessagesToUser.TIE);
-//        }
+    public void updatedGameResultMsg(String winner) {
+        resultMsg.setText(Utils.Constants.QuestionsAndMessagesToUser.WINNER_IS + Utils.Constants.END_LINE + winner);
     }
 
     @Override
@@ -61,5 +42,18 @@ public class ResultScreenController implements Initializable, ControlledScreen {
         
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+    }
+
+    @FXML
+    private void handleGameSelectButtonAction(ActionEvent event) {
+             this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_FXML,(PlayScreenController)myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID));
+    }
+
+    @FXML
+    private void handleExitButtonAction(ActionEvent event) {
+        closeGameAppScene(event);
+    }
+    private void closeGameAppScene(ActionEvent event) {
+        (((Node) event.getSource()).getScene().getWindow()).hide();
     }
 }

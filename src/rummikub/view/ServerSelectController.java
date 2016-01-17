@@ -167,7 +167,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         Platform.runLater(() -> (this.addButton.setDisable(true)));
         String gameName = gameNameInput.getText();
         String playerName = this.playerNameInput.getText();
-        Thread t = new Thread(() -> {
+        Thread thread = new Thread(() -> {
             try {
                 rummikubWebService.createGame(getPlayerName(), getNumOfHumansPlayers(), getNumOfComputerPlayers());
                 initPlayScren(gameName, playerName);
@@ -178,8 +178,8 @@ public class ServerSelectController implements ServerConnection, Initializable, 
                 });
             }
         });
-        t.setDaemon(DAEMON_THREAD);
-        t.start();
+        thread.setDaemon(DAEMON_THREAD);
+        thread.start();
 
     }
 
@@ -190,7 +190,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         String gameName = this.gamesTableView.getSelectionModel().getSelectedItem().getName();
         String playerName = this.playerNameInput.getText();
         this.playerNameInput.clear();
-        Thread t = new Thread(() -> {
+        Thread thread = new Thread(() -> {
             try {
                 initPlayScren(gameName, playerName);
             } catch (DuplicateGameName_Exception | GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
@@ -200,9 +200,8 @@ public class ServerSelectController implements ServerConnection, Initializable, 
                 });
             }
         });
-        t.setDaemon(
-                this.DAEMON_THREAD);
-        t.start();
+        thread.setDaemon(DAEMON_THREAD);
+        thread.start();
     }
 
     private synchronized ObservableList<GameDetails> getListOfWaittingGames() {
@@ -248,7 +247,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     public void resetScreen() {
         initGameViewTable();
         initGameViewTableTimer();
-
+        clearInputFiled();
 //        new Thread(() -> {
 //            ObservableList<GameDetails> gameList = getListOfWaittingGames();
 //            Platform.runLater(() -> {
@@ -414,7 +413,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     public void initGameViewTable() {
 
-        new Thread(() -> {
+        Thread thread = new Thread(() -> {
             ObservableList<GameDetails> gameList = getListOfWaittingGames();
             Platform.runLater(() -> {
                 int index = gamesTableView.getSelectionModel().getSelectedIndex();
@@ -423,7 +422,9 @@ public class ServerSelectController implements ServerConnection, Initializable, 
                     gamesTableView.getSelectionModel().select(index);
                 }
             });
-        }).start();
+        });
+     thread.setDaemon(DAEMON_THREAD);
+     thread.start();
     }
 
     private String getPlayerName() {
