@@ -233,4 +233,8 @@ public class Board {
     public void clear() {
         this.listOfSerie.clear();
     }
+
+    public void removeSeries(Serie serie) {
+        this.listOfSerie.remove(serie);
+    }
 }

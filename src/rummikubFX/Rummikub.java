@@ -5,7 +5,6 @@ package rummikubFX;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -32,10 +31,11 @@ public class Rummikub extends Application {
 
     public static final String RESULT_SCREEN_ID = "resultScreen";
     public static final String RESULT_SCREEN_FXML = "ResultScreen.fxml";
-    public static String SERVER_SELECT_SCREEN_ID="serverSelectScreen";
-    public static String SERVER_SELECT_SCREEN_FXML="ServerSelect.fxml";
-    public static String LOGIN_SCREEN_ID="loginScreen";
-    public static String LOGIN_SCREEN_FXML="LogIn.fxml";
+    public static final String SERVER_SELECT_SCREEN_ID = "serverSelectScreen";
+    public static final String SERVER_SELECT_SCREEN_FXML = "ServerSelect.fxml";
+    public static final String LOGIN_SCREEN_ID = "loginScreen";
+    public static final String LOGIN_SCREEN_FXML = "LogIn.fxml";
+    
     @Override
     public void start(Stage primaryStage) {
         

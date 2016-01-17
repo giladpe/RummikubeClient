@@ -145,7 +145,6 @@ public class ServerSelectController implements ServerConnection, Initializable, 
             initAddButton();
             initJoinButton();
         });
-
     }
 
     @FXML
@@ -175,12 +174,12 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     @FXML
     public void joinButtonClicked() {
         
-        Platform.runLater(() -> (this.joinButton.setDisable(true)));
         String gameName = this.gamesTableView.getSelectionModel().getSelectedItem().getName();
         String playerName = this.playerNameInput.getText();
         this.playerNameInput.clear();
         Thread thread = new Thread(() -> {
             try {
+                Platform.runLater(() -> (this.joinButton.setDisable(true)));
                 initPlayScren(gameName, playerName);
             } catch (DuplicateGameName_Exception | GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
                 Platform.runLater(() -> {
@@ -417,9 +416,15 @@ public class ServerSelectController implements ServerConnection, Initializable, 
             this.playerID = rummikubWebService.joinGame(gameName, playerName);
             PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
             PlayerDetails myDetails = rummikubWebService.getPlayerDetails(playerID);
+//          
+//            gameScreen.setGameName(gameName);
+//            gameScreen.setPlayerId(playerID);
+//            gameScreen.setMyDetails(myDetails);
+
             gameScreen.initWsSetting(service, gameName, playerID, myDetails);
             this.timer.cancel();
-            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
+            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
+
         } catch(Exception ex) {
             onServerLostException();
         }
