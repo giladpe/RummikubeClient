@@ -5,22 +5,15 @@
  */
 package rummikub.view;
 
-import com.sun.javafx.binding.BindingHelperObserver;
-import com.sun.javafx.property.adapter.PropertyDescriptor;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener.Change;
@@ -28,18 +21,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import rummikub.client.ws.DuplicateGameName_Exception;
@@ -50,7 +39,6 @@ import rummikub.client.ws.PlayerDetails;
 import rummikub.client.ws.RummikubWebService;
 import rummikub.client.ws.RummikubWebServiceService;
 import rummikubFX.Rummikub;
-//import rummikub.view.viewObjects.GameProp;
 
 /**
  * FXML Controller class
@@ -60,22 +48,21 @@ import rummikubFX.Rummikub;
 public class ServerSelectController implements ServerConnection, Initializable, ControlledScreen, ResetableScreen {
 
     private static final String INVALID_GAME_NAME_MSG = "Invalid game name!";
-    private static final String NO_HUMAN_MSG = "Chose atleast one human player!";
-    private static final String EMPTY_STRING = "";
     private static final String CONTAINS_WHITE_SPACES_MSG = "Name can not statr with whitespaces!";
     private static final String INVALID_NUMBER = "Invalid number!";
     private static final String INVALID_COMPUTERS_NUMBER = "Invalid computer players number";
     private static final String INVALID_PLAYERS_NUMBER = "Invalid players number";
     private static final String INVALID_HUMANS_NUMBER = "Invalid human players number";
-    private String GAME_DOES_NOT_EXISTS = "Game does not exists";
-    private String INVALID_PARAMETERS = "Invalid parameters input ";
-    private String DUP_NAME = "Duplicate game name insert new name";
+    private static final boolean DAEMON_THREAD = true;
+    private static final long UPDATE_TIME = 3000;
+
+    
+    
     private RummikubWebServiceService service;
     private RummikubWebService rummikubWebService;
     private int playerID;
     //may not need : private SimpleBooleanProperty isServerSelectSceeneShow;
     private Timer timer;
-    private static final boolean DAEMON_THREAD = true;
 
     public RummikubWebServiceService getService() {
         return service;
@@ -176,6 +163,8 @@ public class ServerSelectController implements ServerConnection, Initializable, 
                     showErrorMsg(errorMsg, ex.getMessage());
                     Platform.runLater(() -> (clearInputFiled()));
                 });
+            } catch (Exception ex) {
+                onServerLostException();
             }
         });
         thread.setDaemon(DAEMON_THREAD);
@@ -205,21 +194,30 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     }
 
     private synchronized ObservableList<GameDetails> getListOfWaittingGames() {
-        //new Threa
-        RummikubWebService rummikubWebService = service.getRummikubWebServicePort();
-        List<String> stringGames = rummikubWebService.getWaitingGames();
-        ObservableList<GameDetails> gamesDetails = FXCollections.observableArrayList();
-        for (String stringGame : stringGames) {
-            try {
+        ObservableList<GameDetails> gamesDetails = null;
+        
+        try {
+            List<String> stringGames = rummikubWebService.getWaitingGames();
+            gamesDetails = FXCollections.observableArrayList();
+
+            for (String stringGame : stringGames) {
                 gamesDetails.add(rummikubWebService.getGameDetails(stringGame));
-            } catch (GameDoesNotExists_Exception ex) {
-                Platform.runLater(() -> {
-                    showErrorMsg(errorMsg, ex.getFaultInfo().getMessage());
-                });
             }
+
+        } catch (GameDoesNotExists_Exception ex) {
+            Platform.runLater(() -> {
+                showErrorMsg(errorMsg, ex.getFaultInfo().getMessage());
+            });
+        } catch (Exception ex) {
+            onServerLostException();
         }
+    
         return gamesDetails;
     }
+        
+        
+    
+
 
     public int getNumOfHumansPlayers() {
         int num = 0;
@@ -361,6 +359,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         this.service = service;
         this.rummikubWebService = service.getRummikubWebServicePort();
     }
+        
 
     @Override
     public void setPlayerId(int playerId) {
@@ -381,16 +380,8 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         numOfHumansInput.clear();
         numOfCopmputersInput.clear();
         playerNameInput.clear();
-
     }
 
-    ////test
-//    public void setServerSelectSceeneShow(){
-//        this.isServerSelectSceeneShow.set(true);
-//    }
-//    public void setServerSelectSceeneNotShow(){
-//        this.isServerSelectSceeneShow.set(false);
-//    }
     public void initGameViewTableTimer() {
         timer.schedule(new TimerTask() {
             @Override
@@ -398,18 +389,8 @@ public class ServerSelectController implements ServerConnection, Initializable, 
                 initGameViewTable();
                 initGameViewTableTimer();
             }
-        }, 3000);
+        }, UPDATE_TIME);
     }
-//        if(this.isServerSelectSceeneShow.get()){
-//            Timer timer= new Timer();
-//            timer.schedule(new TimerTask() {
-//                @Override
-//                public void run() {
-//                    initGameViewTable();
-//                    initGameViewTableTimer();
-//                }
-//            }, 3000);       
-//        }
 
     public void initGameViewTable() {
 
@@ -432,13 +413,24 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     }
 
     private void initPlayScren(String gameName, String playerName) throws DuplicateGameName_Exception, GameDoesNotExists_Exception, InvalidParameters_Exception {
+        try {
+            this.playerID = rummikubWebService.joinGame(gameName, playerName);
+            PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+            PlayerDetails myDetails = rummikubWebService.getPlayerDetails(playerID);
+            gameScreen.initWsSetting(service, gameName, playerID, myDetails);
+            this.timer.cancel();
+            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
+        } catch(Exception ex) {
+            onServerLostException();
+        }
         
-        this.playerID = rummikubWebService.joinGame(gameName, playerName);
-        PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-        PlayerDetails myDetails = rummikubWebService.getPlayerDetails(playerID);
-        gameScreen.initWsSetting(service, gameName, playerID, myDetails);
-        this.timer.cancel();
-        this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
+    }
+
+    private void onServerLostException() {
+        Platform.runLater(() -> {
+            showErrorMsg(errorMsg, "Lost connection to server");
+            Platform.runLater(() -> (clearInputFiled()));
+        });
     }
 }
 

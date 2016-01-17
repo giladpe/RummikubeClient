@@ -5,8 +5,6 @@
  */
 package rummikub.view;
 
-import java.io.File;
-import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -14,18 +12,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.io.File;
-import java.io.InputStream;
-
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -42,7 +34,6 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import rummikub.client.ws.RummikubWebServiceService;
 import rummikubFX.Rummikub;
 
@@ -89,15 +80,19 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
         //this.address.setText("http://localhost");
         //this.port.setText("8080");
 
-        this.address.setDisable(true);
-        this.port.setDisable(true);
+        init();
+        
         this.address.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
             addressF = this.address.getText();
+        
+            initLoginButton();
         });
+        
         this.port.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
             this.portF = this.port.getText();
+            
+            initLoginButton();
         });
-        getAddressFromFile();
         changeServerCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) -> {
             initServerChanges(new_val);
         });
@@ -110,25 +105,35 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
 
     @Override
     public void resetScreen() {
-
+        init();        
     }
 
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
-
+        this.loginButton.setDisable(true);
         try {
             //create a URL
             //URL location = new URL( address.getText() + ":" + port.getText() + "/RummikubApi/RummikubWebServiceService?wsdl");
             if (!address.isDisable()) {
                 String[] urlAttribute = {this.addressF, portF};
                 String[] elements = {ADDRESS_ELEMENT, PORT_ELEMENT};
-                CreateXMLDoc(ROOT_ELEMENT, elements, urlAttribute);
+
+                Thread newThread = new Thread(()->{try {
+                    CreateXMLDoc(ROOT_ELEMENT, elements, urlAttribute);
+                    } catch (Exception ex) {
+                        this.errorMsg.setText("Can not create file");
+                    }
+                });
+                newThread.setDaemon(DAEMON_THREAD);
+                newThread.start();
             }
             URL location = new URL(HTTP + addressF + ":" + portF + RUMMIKUB_API);
             ServerSelectController gameSeettingsScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
+            
             gameSeettingsScene.setService(new RummikubWebServiceService(location));
             this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSeettingsScene);
             resetScreen();
+            this.loginButton.setDisable(false);
         } catch (MalformedURLException ex) {
             this.errorMsg.setText("Invalid Url");/////to change
         } catch (Exception ex) {
@@ -137,32 +142,31 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     }
 
     private void getAddressFromFile() {
-        Thread thread = new Thread(() -> {
-            try {
-                File fXmlFile = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                Document doc = dBuilder.parse(fXmlFile);
-                doc.getDocumentElement().normalize();
-                NodeList nList = doc.getElementsByTagName(ROOT_ELEMENT);
-                Node nNode = nList.item(0);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
-                    this.addressF = eElement.getElementsByTagName(ADDRESS_ELEMENT).item(0).getTextContent();
-                    this.portF = eElement.getElementsByTagName(PORT_ELEMENT).item(0).getTextContent();
-                }
-                Platform.runLater(() -> {
-                    this.address.setText(addressF);
-                    this.port.setText(portF);
-                });
-            } catch (Exception ex) {
+        try {
+            File fXmlFile = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(fXmlFile);
+            doc.getDocumentElement().normalize();
+            NodeList nList = doc.getElementsByTagName(ROOT_ELEMENT);
+            Node nNode = nList.item(0);
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nNode;
+                this.addressF = eElement.getElementsByTagName(ADDRESS_ELEMENT).item(0).getTextContent();
+                this.portF = eElement.getElementsByTagName(PORT_ELEMENT).item(0).getTextContent();
+            }
+            Platform.runLater(() -> {
+                this.address.setText(addressF);
+                this.port.setText(portF);
+            });
+        } catch (Exception ex) {
+            Platform.runLater(()->{
+                this.errorMsg.setText("cannot open file");
                 this.addressF = this.portF = "";
                 this.address.setDisable(false);
                 this.port.setDisable(false);
-            }
-        });
-        thread.setDaemon(DAEMON_THREAD);
-        thread.start();
+            });
+        }
     }
 
     private void initServerChanges(Boolean new_val) {
@@ -187,36 +191,38 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     private void handleServrtPortTextChange(ActionEvent event) {
     }
 
-    public static void CreateXMLDoc(String root, String[] elements, String[] children) throws TransformerConfigurationException {
-        Thread thread = new Thread(() -> {
-            try {
-                File dir = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
-                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                Document doc = docBuilder.newDocument();
-                Element rootElement = doc.createElement(root);
-                doc.appendChild(rootElement);
+    public static void CreateXMLDoc(String root, String[] elements, String[] children) throws TransformerConfigurationException, TransformerException, ParserConfigurationException {
+        File dir = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
+        Element rootElement = doc.createElement(root);
+        doc.appendChild(rootElement);
 
-                for (int i = 0; i < children.length; i++) {
-                    Element element = doc.createElement(elements[i]);
-                    element.appendChild(doc.createTextNode(children[i]));
-                    rootElement.appendChild(element);
-                }
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                DOMSource source = new DOMSource(doc);
+        for (int i = 0; i < children.length; i++) {
+            Element element = doc.createElement(elements[i]);
+            element.appendChild(doc.createTextNode(children[i]));
+            rootElement.appendChild(element);
+        }
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource source = new DOMSource(doc);
 
-                StreamResult result = new StreamResult(dir);
-                transformer.transform(source, result);
+        StreamResult result = new StreamResult(dir);
+        transformer.transform(source, result);
+    }
 
-            } catch (ParserConfigurationException pce) {
-                pce.printStackTrace();
-            } catch (TransformerException tfe) {
-                tfe.printStackTrace();
-            }
-        });
-        thread.setDaemon(DAEMON_THREAD);
-        thread.start();
+    private void init() {
+        this.address.setDisable(true);
+        this.port.setDisable(true);
+        
+        Thread newThread = new Thread(()->{ getAddressFromFile(); });
+        newThread.setDaemon(DAEMON_THREAD);
+        newThread.start();
+    }
+
+    private void initLoginButton() {
+        this.loginButton.setDisable(this.address.getText().isEmpty() || this.port.getText().isEmpty());
     }
 }
 // <editor-fold defaultstate="collapsed" desc="Web service Info">

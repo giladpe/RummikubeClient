@@ -4,6 +4,7 @@
 package rummikub.view;
 
 import java.awt.Point;
+import java.net.ConnectException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,19 +35,15 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 import rummikub.client.ws.*;
 import rummikub.gameLogic.model.gameobjects.Tile;
-import rummikub.gameLogic.model.logic.GameLogic;
-import rummikub.gameLogic.model.logic.Settings;
 import rummikub.gameLogic.model.player.Player;
 import rummikubFX.Rummikub;
 import rummikub.gameLogic.controller.rummikub.SingleMove;
 import rummikub.gameLogic.model.gameobjects.Board;
 import rummikub.gameLogic.model.gameobjects.Serie;
-import rummikub.gameLogic.model.logic.PlayersMove;
 import rummikub.gameLogic.model.logic.SeriesGenerator;
 import rummikub.gameLogic.model.player.ComputerSingleMoveGenerator;
 import rummikub.gameLogic.view.ioui.Utils;
@@ -74,30 +71,43 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private static final boolean LEGAL_MOVE = true;
     private static final boolean ENABLE_BUTTON = true;
     private static final boolean DISABLE_DRAG_AND_DROP = true;
-    //private static final long SLEEP_TIME_IN_MILLISECOUNDS = 1000;
+   
+    //Private members
+
     private RummikubWebServiceService service;
     private RummikubWebService rummikubWebService;
     private int playerID;
     private int currEvent;
     private String gameName;
-    List<PlayerDetails> playersDetails;
+    private List<PlayerDetails> playersDetails;
     private int currEventId;
     private PlayerDetails myDetails;
     private Board logicBoard;
-    @FXML
-    private Label turnMsgLabel;
+    
     private static final String PLAYER_RESIGNED = " decided to quite";
     private static final String PLAYER_DONE = " done is Turn";
     private static final String GAME_OVER="Game Is Over";
+    Timer timer;
+    private final ArrayList<Label> playersLabelsList = new ArrayList<>();
+    private ScreensController myController;
+    //private GameLogic rummikubLogic = new GameLogic();
+    private SeriesGenerator serieGenerator;
+    private ComputerSingleMoveGenerator newMoveGenerator;
+    private SimpleBooleanProperty isLegalMove;
+    //private Timeline swapTurnTimeLineDelay;
+    private AnimatedGameBoardPane centerPane;
+    //private PlayersMove currentPlayerMove;
+    private final ArrayList<HBox> playersBarList = new ArrayList<>(MAX_NUM_OF_PLAYERS);
+    private final ArrayList<Label> labelOfNumOfTileInHandList = new ArrayList<>(MAX_NUM_OF_PLAYERS);
+    private final ArrayList<Button> buttonsList = new ArrayList<>();
+    private boolean isUserMadeFirstMoveInGame;
+    private String nameOfCurrPlayerTurn;
 
-    public String getGameName() {
-        return gameName;
-    }
+    
 
-    public void setGameName(String gameName) {
-        this.gameName = gameName;
-    }
     //FXML Private filds
+    @FXML
+    private Label turnMsgLabel;
     @FXML
     private Label errorMsg;
     @FXML
@@ -136,22 +146,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private HBox barPlayer4;
     @FXML
     private Label numTileP4;
-    Timer timer;
-    //Private members
-    private final ArrayList<Label> playersLabelsList = new ArrayList<>();
-    private ScreensController myController;
-    //private GameLogic rummikubLogic = new GameLogic();
-    private SeriesGenerator serieGenerator;
-    private ComputerSingleMoveGenerator newMoveGenerator;
-    private SimpleBooleanProperty isLegalMove;
-    //private Timeline swapTurnTimeLineDelay;
-    private AnimatedGameBoardPane centerPane;
-    //private PlayersMove currentPlayerMove;
-    private final ArrayList<HBox> playersBarList = new ArrayList<>(MAX_NUM_OF_PLAYERS);
-    private final ArrayList<Label> labelOfNumOfTileInHandList = new ArrayList<>(MAX_NUM_OF_PLAYERS);
-    private final ArrayList<Button> buttonsList = new ArrayList<>();
-    private boolean isUserMadeFirstMoveInGame;
-    private String nameOfCurrPlayerTurn;
 
     //Private FXML methods
     @FXML
@@ -167,6 +161,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             } catch (InvalidParameters_Exception ex) {
                 ///to do 
                 Platform.runLater(() -> showGameMsg(errorMsg, ex.getMessage()));
+            } catch(Exception ex) {
+                onServerLostException();
             }
         });
         thread.setDaemon(DAEMON_THREAD);
@@ -186,6 +182,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             }
         } catch (InvalidParameters_Exception ex) {
             Platform.runLater(() -> (showGameMsg(errorMsg, ex.getMessage())));
+        }catch(Exception ex) {
+            onServerLostException();
         }
 
         timer.cancel();
@@ -307,6 +305,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             myDetails = this.rummikubWebService.getPlayerDetails(playerID);
         } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
             showGameMsg(errorMsg, ex.getMessage());
+        }catch(Exception ex) {
+            onServerLostException();
         }
         createPlayerHandWs(myDetails.getTiles());
     }
@@ -342,6 +342,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             } catch (InvalidParameters_Exception ex) {
                 Platform.runLater(() -> (showGameMsg(this.errorMsg, ex.getMessage())));
                 isLegal = false;
+            }catch(Exception ex) {
+                onServerLostException();
             }
             this.isLegalMove.set(isLegal);
         });
@@ -366,7 +368,9 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             try {
                 this.myDetails = rummikubWebService.getPlayerDetails(playerID);
             } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
-                Logger.getLogger(PlayScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                showGameMsg(errorMsg, ex.getMessage());
+            } catch(Exception ex) {
+                onServerLostException();
             }
             this.isLegalMove.set(!LEGAL_MOVE);
             //showCurrentGameBoardAndCurrentPlayerHand();
@@ -407,6 +411,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 playersDetails = this.rummikubWebService.getPlayersDetails(gameName);
             } catch (GameDoesNotExists_Exception ex) {
                 Platform.runLater(() -> (showGameMsg(errorMsg, ex.getMessage())));
+            }  catch(Exception ex) {
+                onServerLostException();
             }
         });
         int index = 0;
@@ -569,6 +575,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             disableButtons();
         } catch (InvalidParameters_Exception ex) {
             showGameMsg(errorMsg, ex.getMessage());
+        } catch(Exception ex) {
+                onServerLostException();
         }
         // Swap players
 //            if (rummikubLogic.isGameOver()) {
@@ -1064,6 +1072,14 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private boolean isMyTurn() {
         return this.nameOfCurrPlayerTurn.equalsIgnoreCase(this.myDetails.getName());
     }
+    
+    public String getGameName() {
+        return gameName;
+    }
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
 
     private Serie getLogicFromWsTileList(List<rummikub.client.ws.Tile> serieToAdd) {
         Serie serie = new Serie();
@@ -1071,5 +1087,11 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             serie.addSpecificTileToSerie(convertWsTileToLogicTile(tile));
         }
         return serie;
+    }
+    
+    private void onServerLostException() {
+        Platform.runLater(() -> {
+            showGameMsg(errorMsg, "Lost connection to server");
+        });
     }
 }

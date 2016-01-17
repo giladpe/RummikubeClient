@@ -4,9 +4,12 @@
 package rummikubFX;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import rummikub.view.ScreensController;
 
 public class Rummikub extends Application {
@@ -35,6 +38,12 @@ public class Rummikub extends Application {
     public static String LOGIN_SCREEN_FXML="LogIn.fxml";
     @Override
     public void start(Stage primaryStage) {
+        
+        primaryStage.setOnCloseRequest((WindowEvent event) -> {
+            Platform.exit();
+            System.exit(0);
+        });
+
         ScreensController screensController = new ScreensController();
         screensController.loadScreen(LOGIN_SCREEN_ID, LOGIN_SCREEN_FXML);
         screensController.loadScreen(PLAY_SCREEN_ID, PLAY_SCREEN_FXML);
@@ -48,6 +57,7 @@ public class Rummikub extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    
     
     /**
      * @param args the command line arguments
