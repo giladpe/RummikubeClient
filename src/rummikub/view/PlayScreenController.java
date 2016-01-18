@@ -41,6 +41,7 @@ import rummikubFX.Rummikub;
 import rummikub.gameLogic.controller.rummikub.SingleMove;
 import rummikub.gameLogic.model.gameobjects.Board;
 import rummikub.gameLogic.model.gameobjects.Serie;
+import rummikub.gameLogic.model.logic.PlayersMove;
 import rummikub.gameLogic.model.logic.SeriesGenerator;
 import rummikub.gameLogic.model.player.ComputerSingleMoveGenerator;
 import rummikub.gameLogic.view.ioui.Utils;
@@ -913,22 +914,45 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         int sourceSerie = event.getSourceSequenceIndex();
         int targetSerie = event.getTargetSequenceIndex();
         int targetPosition = event.getTargetSequencePosition();
-        if (this.logicBoard.getListOfSerie().size() == targetSerie) {
-            this.logicBoard.addSeries(new Serie());
-        }
-        Serie fromSerie = this.logicBoard.getSeries(sourceSerie);
-        Serie toSerie = this.logicBoard.getSeries(targetSerie);
-        Tile tile = fromSerie.getSpecificTile(sourcePosition);
-        fromSerie.removeSpecificTile(sourcePosition);
+        Point target= new Point(targetSerie,targetPosition);
+        Point source= new Point(sourceSerie,sourcePosition);
+        SingleMove singleMove= new SingleMove(target,source, SingleMove.MoveType.BOARD_TO_BOARD);
+        PlayersMove playerMove=new PlayersMove(new ArrayList<>(), new Board(new ArrayList<>(this.logicBoard.getListOfSerie())), myDetails.isPlayedFirstSequence());
+        playerMove.implementSingleMove(singleMove);
+        logicBoard=playerMove.getBoardAfterMove();
+        
+//        init variables in the statrt of the turn
+//Board printableBoard = new Board(new ArrayList<>(rummikubLogic.getGameBoard().getListOfSerie()));
+//        boolean isFirstMoveDone = rummikubLogic.getCurrentPlayer().isFirstMoveDone();
+//        Player printablePlayer = rummikubLogic.getCurrentPlayer().clonePlayer();
+//        this.currentPlayerMove = new PlayersMove(printablePlayer.getListPlayerTiles(), printableBoard, isFirstMoveDone);
+//        this.isUserMadeFirstMoveInGame = CAN_SAVE_THE_GAME;
+//    }
 
-        if (fromSerie.isEmptySeries()) {
-            this.logicBoard.removeSeries(fromSerie);
-        }
-
-        toSerie.addSpecificTileToSerie(tile, targetPosition); //maybe need to check if to add to end 
         Platform.runLater(() -> (showGameBoard()));
 
     }
+//private void handleTileMovedEvent(Event event) {
+//        int sourcePosition = event.getSourceSequencePosition();
+//        int sourceSerie = event.getSourceSequenceIndex();
+//        int targetSerie = event.getTargetSequenceIndex();
+//        int targetPosition = event.getTargetSequencePosition();
+//        if (this.logicBoard.getListOfSerie().size() == targetSerie) {
+//            this.logicBoard.addSeries(new Serie());
+//        }
+//        Serie fromSerie = this.logicBoard.getSeries(sourceSerie);
+//        Serie toSerie = this.logicBoard.getSeries(targetSerie);
+//        Tile tile = fromSerie.getSpecificTile(sourcePosition);
+//        fromSerie.removeSpecificTile(sourcePosition);
+//
+//        if (fromSerie.isEmptySeries()) {
+//            this.logicBoard.removeSeries(fromSerie);
+//        }
+//
+//        toSerie.addSpecificTileToSerie(tile, targetPosition); //maybe need to check if to add to end 
+//        Platform.runLater(() -> (showGameBoard()));
+//
+//    }
 
     private void handleTileReturnedEvent(Event event) {
         int sourceIndex = event.getSourceSequenceIndex();
