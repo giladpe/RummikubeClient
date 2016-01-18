@@ -79,7 +79,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     @FXML
     private Button loadGameButton;
     private static final boolean ENABLED = true;
-    private static final String CHOOSE_PLAYER="Choose Player name: ";
+    private static final String CHOOSE_PLAYER = "Choose Player name: ";
 
     public RummikubWebServiceService getService() {
         return service;
@@ -149,7 +149,9 @@ public class ServerSelectController implements ServerConnection, Initializable, 
             try {
                 onTableViewChange();
             } catch (GameDoesNotExists_Exception ex) {
-                Platform.runLater(()->{showErrorMsg(errorMsg, ex.getMessage());});
+                Platform.runLater(() -> {
+                    showErrorMsg(errorMsg, ex.getMessage());
+                });
             }
         });
         ///add listener to game name 
@@ -418,10 +420,10 @@ public class ServerSelectController implements ServerConnection, Initializable, 
             ObservableList<GameDetails> gameList = getListOfWaittingGames();
             Platform.runLater(() -> {
                 int index = gamesTableView.getSelectionModel().getSelectedIndex();
+                gamesTableView.setItems(gameList);
                 if (index >= 0) {
                     gamesTableView.getSelectionModel().select(index);
                 }
-                gamesTableView.setItems(gameList);
 
             });
         });
@@ -525,18 +527,17 @@ public class ServerSelectController implements ServerConnection, Initializable, 
             });
         }
     }
-    
-    private String getPlayersNames(List<PlayerDetails> playersList) {
-        String res="";
-        for (PlayerDetails playerDetails : playersList) {
-        
 
-            if(!playerDetails.getStatus().equals(PlayerStatus.JOINED)){
-                res+=playerDetails.getName()+",";
+    private String getPlayersNames(List<PlayerDetails> playersList) {
+        String res = "";
+        for (PlayerDetails playerDetails : playersList) {
+
+            if (!playerDetails.getStatus().equals(PlayerStatus.JOINED)) {
+                res += playerDetails.getName() + ",";
             }
         }
-        if(!res.isEmpty()){
-            res=res.substring(0, res.length()-1);
+        if (!res.isEmpty()) {
+            res = res.substring(0, res.length() - 1);
         }
         return res;
     }
