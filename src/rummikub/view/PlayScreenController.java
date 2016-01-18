@@ -164,7 +164,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     private synchronized void getRummikubeWsEvents() {
-
+        timer.cancel();
         List<Event> eventList;
         try {
             eventList = this.rummikubWebService.getEvents(playerID, currEventId); //todo
@@ -180,7 +180,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         //onServerLostException();
         //}
 
-        timer.cancel();
         this.timer = new Timer(DAEMON_THREAD);// allready open new thared 
         timer.schedule(new TimerTask() {
             @Override
@@ -839,7 +838,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         if (myDetails.getName().equalsIgnoreCase(playerResignedName)) {
             this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, this);
         }
-
     }
 
     private void handlePlayerTurnEvent(Event event) {
@@ -868,8 +866,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     private void handleRevertEvent(Event event) {
+       Platform.runLater(()->( this.centerPane.resetScreen()));
         this.logicBoard = new Board();
-
     }
 
     private void handleTileAddedEvent(Event event) {

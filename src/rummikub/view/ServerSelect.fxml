@@ -43,7 +43,7 @@
          </GridPane.margin>
       </Button>
       <Label id="errorMsg" fx:id="errorMsg" alignment="TOP_CENTER" contentDisplay="TOP" prefHeight="20.0" prefWidth="679.0" stylesheets="@resources/menusStyle.css" textAlignment="CENTER" textFill="#ee3737" GridPane.columnSpan="4" GridPane.rowIndex="8" />
-      <VBox fx:id="tableVBox" prefHeight="179.0" prefWidth="401.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.rowSpan="5">
+      <VBox fx:id="tableVBox" prefHeight="228.0" prefWidth="401.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.rowSpan="6">
          <children>
             <TableView fx:id="gamesTableView" prefHeight="218.0" prefWidth="401.0">
               <columns>
@@ -64,6 +64,7 @@
                   <Button fx:id="addButton" mnemonicParsing="false" onAction="#addButtonClicked" prefHeight="23.0" prefWidth="65.0" text="Add" />
                </children>
             </HBox>
+            <Button fx:id="loadGameButton" minHeight="25.0" mnemonicParsing="false" onAction="#loadGameButtonClicked" prefHeight="33.0" prefWidth="401.0" text="Load Game" />
          </children>
       </VBox>
    </children>
