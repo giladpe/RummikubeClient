@@ -144,6 +144,9 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     //Private FXML methods
     @FXML
     private void handleMenuButtonAction(ActionEvent event) {
+        SubMenuController subMenuController = (SubMenuController) this.myController.getControllerScreen(Rummikub.SUBMENU_SCREEN_ID);
+        subMenuController.setPlayerId(playerID);
+        subMenuController.setService(service);
         this.myController.setScreen(Rummikub.SUBMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 
@@ -419,7 +422,12 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                     }
                     index=0;
                     for (PlayerDetails playerDetails : playersDetails) {
-                        this.labelOfNumOfTileInHandList.get(index).setText(String.valueOf(playerDetails.getNumberOfTiles()));
+                        if (playerDetails.getStatus() == PlayerStatus.ACTIVE) {
+                            this.labelOfNumOfTileInHandList.get(index).setText(String.valueOf(playerDetails.getNumberOfTiles()));
+                        }
+                        else {
+                            this.labelOfNumOfTileInHandList.get(index).setText(" - RETIRED!!!");
+                        }
                         index++;
                     }
                 });
@@ -818,6 +826,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private void handleGameWinnerEvent(Event event) {
         ResultScreenController resultScreenController = (ResultScreenController) this.myController.getControllerScreen(Rummikub.RESULT_SCREEN_ID);
         resultScreenController.updatedGameResultMsg(event.getPlayerName());
+        this.myController.setScreen(Rummikub.RESULT_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 
     private void handlePlayerFinishedTurnEvent(Event event) {
@@ -836,7 +845,10 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             initPlayerLabelWs();
         });
         if (myDetails.getName().equalsIgnoreCase(playerResignedName)) {
-            this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, this);
+            this.timer.cancel();
+            this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, ScreensController.NOT_RESETABLE);
+            //old: i think it is wrong because it starts getting events again
+            //this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, this);
         }
     }
 

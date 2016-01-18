@@ -418,10 +418,11 @@ public class ServerSelectController implements ServerConnection, Initializable, 
             ObservableList<GameDetails> gameList = getListOfWaittingGames();
             Platform.runLater(() -> {
                 int index = gamesTableView.getSelectionModel().getSelectedIndex();
-                gamesTableView.setItems(gameList);
                 if (index >= 0) {
                     gamesTableView.getSelectionModel().select(index);
                 }
+                gamesTableView.setItems(gameList);
+
             });
         });
         thread.setDaemon(DAEMON_THREAD);
@@ -510,18 +511,21 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     private void onTableViewChange() throws GameDoesNotExists_Exception {
         GameDetails gameDetails = this.gamesTableView.getSelectionModel().getSelectedItem();
-        String gameName = gameDetails.getName();
-        prompt = NAME_PROMPT;
-        if (gameDetails.isLoadedFromXML()) {
-            ///toooo deal with connect to server exption 
-            List<PlayerDetails> playersList = rummikubWebService.getPlayersDetails(gameName);
-            prompt = CHOOSE_PLAYER + getPlayersNames(playersList);
+        if (gameDetails != null) {
+            String gameName = gameDetails.getName();
+            prompt = NAME_PROMPT;
+            if (gameDetails.isLoadedFromXML()) {
+                ///toooo deal with connect to server exption 
+                List<PlayerDetails> playersList = rummikubWebService.getPlayersDetails(gameName);
+                prompt = CHOOSE_PLAYER + getPlayersNames(playersList);
+            }
+            Platform.runLater(() -> {
+                joinButton.setDisable(this.playerNameInput.getText().isEmpty());
+                this.playerNameInput.setPromptText(prompt);
+            });
         }
-        Platform.runLater(() -> {
-            joinButton.setDisable(this.playerNameInput.getText().isEmpty());
-            this.playerNameInput.setPromptText(prompt);
-        });
     }
+    
     private String getPlayersNames(List<PlayerDetails> playersList) {
         String res="";
         for (PlayerDetails playerDetails : playersList) {

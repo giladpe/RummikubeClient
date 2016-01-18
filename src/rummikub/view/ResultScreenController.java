@@ -46,13 +46,14 @@ public class ResultScreenController implements Initializable, ControlledScreen {
 
     @FXML
     private void handleGameSelectButtonAction(ActionEvent event) {
-             this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_FXML,(PlayScreenController)myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID));
+        this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 
     @FXML
     private void handleExitButtonAction(ActionEvent event) {
         closeGameAppScene(event);
     }
+    
     private void closeGameAppScene(ActionEvent event) {
         (((Node) event.getSource()).getScene().getWindow()).hide();
     }

@@ -58,20 +58,20 @@ public class SubMenuController implements Initializable, ControlledScreen, Serve
 
     @FXML
     private void handlePlayerResignedGameButtonAction(ActionEvent event) {
-        PlayScreenController playScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
+        //PlayScreenController playScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
         try {
             GameDetails game = this.rummikubWebService.getGameDetails(gameName);
             GameStatus st=game.getStatus();
-            if (st.equals(GameStatus.ACTIVE)) {
+            if (st == GameStatus.ACTIVE) {
                 this.rummikubWebService.resign(playerID);
             }
 
         } catch (InvalidParameters_Exception | GameDoesNotExists_Exception ex) {
             int i=0;
         }
-        ServerSelectController gameSelectScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
-        this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSelectScene);
-        playScreen.resetScreen();
+        //ServerSelectController gameSelectScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
+        //this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSelectScene);
+        //playScreen.resetScreen();
     }
 
     @FXML
