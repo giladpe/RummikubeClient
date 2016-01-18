@@ -8,12 +8,15 @@ package rummikub.view;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -41,6 +44,7 @@ import rummikub.client.ws.DuplicateGameName_Exception;
 import rummikub.client.ws.GameDetails;
 import rummikub.client.ws.GameDoesNotExists_Exception;
 import rummikub.client.ws.InvalidParameters_Exception;
+import rummikub.client.ws.InvalidXML_Exception;
 import rummikub.client.ws.PlayerDetails;
 import rummikub.client.ws.RummikubWebService;
 import rummikub.client.ws.RummikubWebServiceService;
@@ -55,6 +59,7 @@ import rummikubFX.Rummikub;
  */
 public class ServerSelectController implements ServerConnection, Initializable, ControlledScreen, ResetableScreen {
 
+    private static final String NAME_PROMPT = "Insert Player Name";
     private static final String INVALID_GAME_NAME_MSG = "Invalid game name!";
     private static final String CONTAINS_WHITE_SPACES_MSG = "Name can not statr with whitespaces!";
     private static final String INVALID_NUMBER = "Invalid number!";
@@ -64,7 +69,6 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     private final static String FAIL_LOADING_FILE_MSG = "Error was not able to load file!";
     private static final boolean DAEMON_THREAD = true;
     private static final long UPDATE_TIME = 3000;
-
     private RummikubWebServiceService service;
     private RummikubWebService rummikubWebService;
     private int playerID;
@@ -137,7 +141,10 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         this.joinButton.setOnAction(e -> joinButtonClicked());
         initAddButton();
         //this.gamesTableView.selectionModelProperty().addListener(new PropertyDescriptor.Listener<>);
-        gamesTableView.getSelectionModel().getSelectedItems().addListener((Change<? extends GameDetails> change) -> joinButton.setDisable(this.playerNameInput.getText().isEmpty()));
+
+        gamesTableView.getSelectionModel().getSelectedItems().addListener((Change<? extends GameDetails> change) -> {
+            onTableViewChange();
+        });
         ///add listener to game name 
         this.gameNameInput.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
             isValidGameName();
@@ -450,12 +457,16 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         FileChooser.ExtensionFilter extFilterXML = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.XML");
         fileChooser.getExtensionFilters().add(extFilterXML);
 
-        Platform.runLater(() -> (disableButtonsControls(!ENABLED)));
+        Platform.runLater(() -> (disableButtonsControls()));
         File file = fileChooser.showOpenDialog(((Button) event.getSource()).getContextMenu());
         if (file != null) {
             try {
                 new Thread(() -> {
-                    loadGame(file);
+                    try {
+                        loadGame(file);
+                    } catch (DuplicateGameName_Exception | IOException | InvalidParameters_Exception | InvalidXML_Exception ex) {
+                        showErrorMsg(errorMsg, FAIL_LOADING_FILE_MSG);
+                    }
                 }).start();
             } catch (Exception ex) {
                 Platform.runLater(() -> {
@@ -468,49 +479,17 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         Platform.runLater(() -> (initAllButton()));
     }
 
-    private void loadGame(File file) {
+    private void loadGame(File file) throws DuplicateGameName_Exception, IOException, InvalidParameters_Exception, InvalidXML_Exception {
         boolean succedLoadingFile = false;
-
+        String content;
         Platform.runLater(() -> {
             resetScreen();
         });
-        //String content = new String(File.readAllBytes
-        
-        try {
-            succedLoadingFile = JaxBXmlParser.loadSettingsFromXml(file);
-
-            if (succedLoadingFile) {
-                GameLogic rummikubLogic = new GameLogic();
-                rummikubLogic.initGameFromFile(JaxBXmlParser.getPlayerArray(),
-                        JaxBXmlParser.getBoard(),
-                        JaxBXmlParser.getCurrPlayer(),
-                        JaxBXmlParser.getGameName());
-
-                PlayScreenController gameScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
-                //gameScreen.setRummikubLogic(rummikubLogic);
-
-                this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, null);
-                //gameScreen.initCurrentPlayerMove();
-
-                Platform.runLater(() -> {
-                  //  gameScreen.initAllGameComponents();
-                    resetScreen();
-                });
-
-            }
-        } catch (SAXException | IOException ex) {
-            succedLoadingFile = false;
-        } finally {
-            if (!succedLoadingFile) {
-                Platform.runLater(() -> {
-                    errorMsg.setText(FAIL_LOADING_FILE_MSG);
-                });
-                Thread.currentThread().stop();
-            }
-        }
+        content = new String(Files.readAllBytes(file.toPath()));
+        this.rummikubWebService.createGameFromXML(content);
     }
 
-    private void disableButtonsControls(boolean b) {
+    private void disableButtonsControls() {
         this.buttonsList.stream().forEach((button) -> {
             button.setDisable(true);
         });
@@ -522,6 +501,18 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         this.loadGameButton.setDisable(false);
     }
 
+    private void onTableViewChange() {
+        GameDetails gameDetails = this.gamesTableView.getSelectionModel().getSelectedItem();
+        String gameName = gameDetails.getName();
+        String prompt = NAME_PROMPT;
+        String playersOption = "Artur is gay";
+        if (gameDetails.isLoadedFromXML()) {
+            prompt = "Choose Player name: " + playersOption;
+        }
+        Platform.runLater(() -> {
+            joinButton.setDisable(this.playerNameInput.getText().isEmpty());
+        });
+    }
 }
 
 //public class NumberTextField extends TextField
