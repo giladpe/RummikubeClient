@@ -46,6 +46,7 @@ import rummikub.client.ws.GameDoesNotExists_Exception;
 import rummikub.client.ws.InvalidParameters_Exception;
 import rummikub.client.ws.InvalidXML_Exception;
 import rummikub.client.ws.PlayerDetails;
+import rummikub.client.ws.PlayerStatus;
 import rummikub.client.ws.RummikubWebService;
 import rummikub.client.ws.RummikubWebServiceService;
 import rummikub.gameLogic.model.logic.GameLogic;
@@ -72,11 +73,13 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     private RummikubWebServiceService service;
     private RummikubWebService rummikubWebService;
     private int playerID;
+    private String prompt;
     //may not need : private SimpleBooleanProperty isServerSelectSceeneShow;
     private Timer timer;
     @FXML
     private Button loadGameButton;
     private static final boolean ENABLED = true;
+    private static final String CHOOSE_PLAYER="Choose Player name: ";
 
     public RummikubWebServiceService getService() {
         return service;
@@ -143,7 +146,11 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         //this.gamesTableView.selectionModelProperty().addListener(new PropertyDescriptor.Listener<>);
 
         gamesTableView.getSelectionModel().getSelectedItems().addListener((Change<? extends GameDetails> change) -> {
-            onTableViewChange();
+            try {
+                onTableViewChange();
+            } catch (GameDoesNotExists_Exception ex) {
+                Platform.runLater(()->{showErrorMsg(errorMsg, ex.getMessage());});
+            }
         });
         ///add listener to game name 
         this.gameNameInput.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
@@ -501,17 +508,33 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         this.loadGameButton.setDisable(false);
     }
 
-    private void onTableViewChange() {
+    private void onTableViewChange() throws GameDoesNotExists_Exception {
         GameDetails gameDetails = this.gamesTableView.getSelectionModel().getSelectedItem();
         String gameName = gameDetails.getName();
-        String prompt = NAME_PROMPT;
-        String playersOption = "Artur is gay";
+        prompt = NAME_PROMPT;
         if (gameDetails.isLoadedFromXML()) {
-            prompt = "Choose Player name: " + playersOption;
+            ///toooo deal with connect to server exption 
+            List<PlayerDetails> playersList = rummikubWebService.getPlayersDetails(gameName);
+            prompt = CHOOSE_PLAYER + getPlayersNames(playersList);
         }
         Platform.runLater(() -> {
             joinButton.setDisable(this.playerNameInput.getText().isEmpty());
+            this.playerNameInput.setPromptText(prompt);
         });
+    }
+    private String getPlayersNames(List<PlayerDetails> playersList) {
+        String res="";
+        for (PlayerDetails playerDetails : playersList) {
+        
+
+            if(!playerDetails.getStatus().equals(PlayerStatus.JOINED)){
+                res+=playerDetails.getName()+",";
+            }
+        }
+        if(!res.isEmpty()){
+            res=res.substring(0, res.length()-1);
+        }
+        return res;
     }
 }
 
