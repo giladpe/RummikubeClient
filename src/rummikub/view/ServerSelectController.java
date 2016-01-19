@@ -517,6 +517,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         content = new String(Files.readAllBytes(file.toPath()));
 
         this.rummikubWebService.createGameFromXML(content);
+        Platform.runLater(()->(this.initGameViewTable()));
     }
 
     private void disableButtonsControls() {
