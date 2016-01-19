@@ -299,7 +299,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         }
     }
 
-    private void showPlayerHandWs() {
+    private synchronized void showPlayerHandWs() {
         try {
             myDetails = this.rummikubWebService.getPlayerDetails(playerID);
             createPlayerHandWs(myDetails.getTiles());
@@ -714,7 +714,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 //            this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
 //        }
 //    }
-    public void showGameBoard() {
+    public synchronized void showGameBoard() {
         setBoard(logicBoard.getListOfSerie());
     }
 //
@@ -906,9 +906,9 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     }
 
-    private void handleSequenceCreatedEvent(Event event) {
+    private void  handleSequenceCreatedEvent(Event event) {
         List<rummikub.client.ws.Tile> serieToAdd = event.getTiles();
-        Serie serie = getLogicFromWsTileList(serieToAdd);
+        Serie serie = getLogicSerieFromWsTileList(serieToAdd);
         logicBoard.addSeries(serie);
         Platform.runLater(() -> {
             showGameBoard();
@@ -1230,7 +1230,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         this.gameName = gameName;
     }
 
-    private Serie getLogicFromWsTileList(List<rummikub.client.ws.Tile> serieToAdd) {
+    private Serie getLogicSerieFromWsTileList(List<rummikub.client.ws.Tile> serieToAdd) {
         Serie serie = new Serie();
         for (rummikub.client.ws.Tile tile : serieToAdd) {
             serie.addSpecificTileToSerie(convertWsTileToLogicTile(tile));
