@@ -264,6 +264,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     @Override
     public void resetScreen() {
+        this.playerNameInput.setPromptText(NAME_PROMPT);
         initGameViewTable();
         initGameViewTableTimer();
         initAllButton();
