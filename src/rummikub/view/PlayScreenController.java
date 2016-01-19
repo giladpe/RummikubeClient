@@ -337,15 +337,17 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                             this.rummikubWebService.addTile(playerID, tile, target.x, target.y);
                         }
                         break;
-
                 }
-            } catch (InvalidParameters_Exception ex) {
+                
+                this.isLegalMove.set(isLegal);
+            } 
+            catch (InvalidParameters_Exception ex) {
                 Platform.runLater(() -> (showGameMsg(this.errorMsg, ex.getMessage())));
                 isLegal = false;
+                this.isLegalMove.set(isLegal);
             } //catch(Exception ex) {
             // onServerLostException();
             //}
-            this.isLegalMove.set(isLegal);
         });
         thread.setDaemon(DAEMON_THREAD);
         thread.start();
