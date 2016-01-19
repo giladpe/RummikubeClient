@@ -69,6 +69,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private static final boolean LEGAL_MOVE = true;
     private static final boolean ENABLE_BUTTON = true;
     private static final boolean DISABLE_DRAG_AND_DROP = true;
+    private static final int INDEX_NORMALIZATION = 1;
+
 
     //Private members
     private RummikubWebServiceService service;
@@ -915,32 +917,109 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
         //Platform.runLater(() -> {centerPane.getChildren().add(createFlowPaneSerie(serie));});
     }
+    
+    private void checkIfToAddNewSeriesToBoard(SingleMove move) {
+        boolean doAddNewSiresToBoard;
+        int chosenLine = (int)move.getpTarget().getX();
+        
+        doAddNewSiresToBoard = this.logicBoard.isNewLineForTheBoard(chosenLine);
+        if (doAddNewSiresToBoard){
+            this.logicBoard.addSeries(new Serie());
+        }
+    }
+    
+    private Tile getTileToSwap(int toLine, int fromLine, int whatTileInToLine) {
+        Tile tileToSwap = null;
+        Serie serieTarget;
+        
+        if (fromLine == toLine || toLine != this.logicBoard.boardSize() - INDEX_NORMALIZATION) {
+            serieTarget = this.logicBoard.getSeries(toLine);
+
+            if (serieTarget.getSizeOfSerie() == whatTileInToLine) {
+                tileToSwap = this.logicBoard.getSpecificTile(toLine, serieTarget.getSizeOfSerie()-INDEX_NORMALIZATION);
+            } 
+            else {
+                tileToSwap = this.logicBoard.getSpecificTile(toLine, whatTileInToLine);
+            }
+        }
+        
+        return tileToSwap;
+    }
+    
+    private void setTilesAfterChange(SingleMove move) {
+        int fromLine = (int)move.getpSource().getX(), whatTileInFromLine = (int)move.getpSource().getY();
+        int toLine = (int)move.getpTarget().getX(), whatTileInToLine = (int)move.getpTarget().getY();
+        Tile tileToMove = this.logicBoard.getSpecificTile(fromLine, whatTileInFromLine);
+        Tile tileToSwap = getTileToSwap(toLine, fromLine, whatTileInToLine);
+
+        if (fromLine == toLine && tileToMove.isEqualTiles(tileToSwap)) {
+            if (whatTileInFromLine > whatTileInToLine) {
+                this.logicBoard.setSpecificTile(tileToMove, toLine, whatTileInToLine);	
+                whatTileInFromLine++;
+                this.logicBoard.removeSpecificTile(fromLine, whatTileInFromLine);
+            }
+            else {
+                if (whatTileInToLine == this.logicBoard.getSeries(toLine).getSizeOfSerie()) {
+                    this.logicBoard.getSeries(toLine).addSpecificTileToSerie(tileToMove);
+                    this.logicBoard.removeSpecificTile(toLine, whatTileInFromLine);
+                }
+                else {
+                    if (whatTileInToLine != this.logicBoard.getSeries(toLine).getSizeOfSerie()-INDEX_NORMALIZATION) {
+                        whatTileInToLine++;
+                    }
+                    this.logicBoard.setSpecificTile(tileToMove, toLine, whatTileInToLine);
+                    this.logicBoard.removeSpecificTile(fromLine, whatTileInFromLine);
+                }
+            }
+        }
+        else {
+            this.logicBoard.setSpecificTile(tileToMove, toLine, whatTileInToLine);	
+            this.logicBoard.removeSpecificTile(fromLine, whatTileInFromLine);
+        }
+    }
 
     private void handleTileMovedEvent(Event event) {
         int sourcePosition = event.getSourceSequencePosition();
         int sourceSerie = event.getSourceSequenceIndex();
         int targetSerie = event.getTargetSequenceIndex();
         int targetPosition = event.getTargetSequencePosition();
-        Point target= new Point(targetSerie,targetPosition);
-        Point source= new Point(sourceSerie,sourcePosition);
+        Point target = new Point(targetSerie,targetPosition);
+        Point source = new Point(sourceSerie,sourcePosition);
         SingleMove singleMove = new SingleMove(target,source, SingleMove.MoveType.BOARD_TO_BOARD);
-        PlayersMove playerMove = new PlayersMove(new ArrayList<>(),
-                                                 new Board(new ArrayList<>(this.logicBoard.getListOfSerie())),
-                                                 this.playersDetails.get(findPlayerByName(this.nameOfCurrPlayerTurn)).isPlayedFirstSequence());
-        playerMove.implementSingleMove(singleMove);
-        logicBoard = playerMove.getBoardAfterMove();
-        
-//        init variables in the statrt of the turn
-//Board printableBoard = new Board(new ArrayList<>(rummikubLogic.getGameBoard().getListOfSerie()));
-//        boolean isFirstMoveDone = rummikubLogic.getCurrentPlayer().isFirstMoveDone();
-//        Player printablePlayer = rummikubLogic.getCurrentPlayer().clonePlayer();
-//        this.currentPlayerMove = new PlayersMove(printablePlayer.getListPlayerTiles(), printableBoard, isFirstMoveDone);
-//        this.isUserMadeFirstMoveInGame = CAN_SAVE_THE_GAME;
-//    }
-
+       
+        checkIfToAddNewSeriesToBoard(singleMove);
+        setTilesAfterChange(singleMove);
         Platform.runLater(() -> (showGameBoard()));
 
     }
+    
+    
+    
+//    private void handleTileMovedEvent(Event event) {
+//        int sourcePosition = event.getSourceSequencePosition();
+//        int sourceSerie = event.getSourceSequenceIndex();
+//        int targetSerie = event.getTargetSequenceIndex();
+//        int targetPosition = event.getTargetSequencePosition();
+//        Point target= new Point(targetSerie,targetPosition);
+//        Point source= new Point(sourceSerie,sourcePosition);
+//        SingleMove singleMove = new SingleMove(target,source, SingleMove.MoveType.BOARD_TO_BOARD);
+//        PlayersMove playerMove = new PlayersMove(new ArrayList<>(),
+//                                                 new Board(new ArrayList<>(this.logicBoard.getListOfSerie())),
+//                                                 this.playersDetails.get(findPlayerByName(this.nameOfCurrPlayerTurn)).isPlayedFirstSequence());
+//        playerMove.implementSingleMove(singleMove);
+//        logicBoard = playerMove.getBoardAfterMove();
+//        
+////        init variables in the statrt of the turn
+////Board printableBoard = new Board(new ArrayList<>(rummikubLogic.getGameBoard().getListOfSerie()));
+////        boolean isFirstMoveDone = rummikubLogic.getCurrentPlayer().isFirstMoveDone();
+////        Player printablePlayer = rummikubLogic.getCurrentPlayer().clonePlayer();
+////        this.currentPlayerMove = new PlayersMove(printablePlayer.getListPlayerTiles(), printableBoard, isFirstMoveDone);
+////        this.isUserMadeFirstMoveInGame = CAN_SAVE_THE_GAME;
+////    }
+//
+//        Platform.runLater(() -> (showGameBoard()));
+//
+//    }
     
 //private void handleTileMovedEvent(Event event) {
 //        int sourcePosition = event.getSourceSequencePosition();
