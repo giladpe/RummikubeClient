@@ -446,7 +446,11 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
             gameScreen.initWsSetting(service, gameName, playerID, myDetails);
             this.timer.cancel();
-            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
+            
+//            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
+            
+            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
+            gameScreen.resetScreen();
 
         } catch (Exception ex) {
             onServerLostException();
