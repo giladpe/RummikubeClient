@@ -496,6 +496,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
             resetScreen();
         });
         content = new String(Files.readAllBytes(file.toPath()));
+
         this.rummikubWebService.createGameFromXML(content);
     }
 
@@ -512,27 +513,38 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     }
 
     private void onTableViewChange() throws GameDoesNotExists_Exception {
-        GameDetails gameDetails = this.gamesTableView.getSelectionModel().getSelectedItem();
-        if (gameDetails != null) {
-            String gameName = gameDetails.getName();
-            prompt = NAME_PROMPT;
-            if (gameDetails.isLoadedFromXML()) {
-                ///toooo deal with connect to server exption 
-                List<PlayerDetails> playersList = rummikubWebService.getPlayersDetails(gameName);
-                prompt = CHOOSE_PLAYER + getPlayersNames(playersList);
+        Thread thread = new Thread(() -> {
+            GameDetails gameDetails = this.gamesTableView.getSelectionModel().getSelectedItem();
+            if (gameDetails != null) {
+                String gameName = gameDetails.getName();
+                prompt = NAME_PROMPT;
+                if (gameDetails.isLoadedFromXML()) {
+                    ///toooo deal with connect to server exption 
+                    List<PlayerDetails> playersList;
+                    try {
+                        playersList = rummikubWebService.getPlayersDetails(gameName);
+                        prompt = CHOOSE_PLAYER + getPlayersNames(playersList);
+                    } catch (GameDoesNotExists_Exception ex) {
+                        showErrorMsg(errorMsg, ex.getMessage());
+                    }
+
+                }
+                Platform.runLater(() -> {
+                    joinButton.setDisable(this.playerNameInput.getText().isEmpty());
+                    this.playerNameInput.setPromptText(prompt);
+                });
+            
             }
-            Platform.runLater(() -> {
-                joinButton.setDisable(this.playerNameInput.getText().isEmpty());
-                this.playerNameInput.setPromptText(prompt);
-            });
-        }
+        });
+        thread.setDaemon(DAEMON_THREAD);
+        thread.start();
     }
 
     private String getPlayersNames(List<PlayerDetails> playersList) {
         String res = "";
         for (PlayerDetails playerDetails : playersList) {
-
-            if (!playerDetails.getStatus().equals(PlayerStatus.JOINED)) {
+//||!playerDetails.getStatus().equals(PlayerStatus.JOINED
+            if (playerDetails.getStatus()==null) {
                 res += playerDetails.getName() + ",";
             }
         }
