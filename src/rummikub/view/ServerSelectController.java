@@ -488,13 +488,15 @@ public class ServerSelectController implements ServerConnection, Initializable, 
         File file = fileChooser.showOpenDialog(((Button) event.getSource()).getContextMenu());
         if (file != null) {
             try {
-                new Thread(() -> {
+                Thread thread =new Thread(() -> {
                     try {
                         loadGame(file);
                     } catch (DuplicateGameName_Exception | IOException | InvalidParameters_Exception | InvalidXML_Exception ex) {
                         showErrorMsg(errorMsg, FAIL_LOADING_FILE_MSG);
                     }
-                }).start();
+                });
+                thread.setDaemon(DAEMON_THREAD);
+                thread.start();
             } catch (Exception ex) {
                 Platform.runLater(() -> {
                     showErrorMsg(errorMsg, FAIL_LOADING_FILE_MSG);
