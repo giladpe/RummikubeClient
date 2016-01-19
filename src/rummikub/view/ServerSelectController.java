@@ -179,12 +179,13 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
         Platform.runLater(() -> (this.addButton.setDisable(true)));
         String gameName = gameNameInput.getText();
-        String playerName = this.playerNameInput.getText();
+        //String playerName = this.playerNameInput.getText();
         Thread thread = new Thread(() -> {
             try {
                 rummikubWebService.createGame(getPlayerName(), getNumOfHumansPlayers(), getNumOfComputerPlayers());
-                initPlayScrenAndSubMenu(gameName, playerName);
-            } catch (DuplicateGameName_Exception | GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
+                Platform.runLater(()->(initGameViewTable()));
+                //initPlayScrenAndSubMenu(gameName, playerName);
+            } catch (DuplicateGameName_Exception | InvalidParameters_Exception ex) {
                 Platform.runLater(() -> {
                     showErrorMsg(errorMsg, ex.getMessage());
                     Platform.runLater(() -> (clearInputFiled()));
@@ -355,7 +356,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
 
     private boolean isAllSet() {
         boolean allSet = true;
-        if (this.playerNameInput.getText().isEmpty() || this.gameNameInput.getText().isEmpty()) {
+        if (/*this.playerNameInput.getText().isEmpty() || */this.gameNameInput.getText().isEmpty()) {
             allSet = false;
         }
         if (getNumOfHumansPlayers() > 4 || getNumOfHumansPlayers() < 1) {

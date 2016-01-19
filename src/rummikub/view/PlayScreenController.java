@@ -555,7 +555,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         this.myController.setScreen(Rummikub.RESULT_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 
-    private void initTileListeners(AnimatedTilePane viewTile) {
+    
+ private void initTileListeners(AnimatedTilePane viewTile) {
         if (isMyTurn()) {
             viewTile.addSingleMoveListener((ObservableValue<? extends SingleMove> observable, SingleMove oldValue, SingleMove newValue) -> {
                 onMakeSingleMove(newValue);
