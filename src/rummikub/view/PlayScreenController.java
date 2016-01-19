@@ -746,6 +746,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         handTile.getChildren().clear();
         this.errorMsg.setText(Utils.Constants.EMPTY_STRING);
         //show();
+        this.centerPane.resetScreen();
         getRummikubeWsEvents();
     }
 
@@ -889,7 +890,13 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         int targetSerie = event.getTargetSequenceIndex();
         int targetPosition = event.getTargetSequencePosition();
         Serie toSerie = this.logicBoard.getSeries(targetSerie);
-        toSerie.addSpecificTileToSerie(convertWsTileToLogicTile(tileToAdd), targetPosition); //maybe need to check if to add to end 
+        
+        if (toSerie.getSizeOfSerie() == targetPosition) {
+            toSerie.addSpecificTileToSerie(convertWsTileToLogicTile(tileToAdd));
+        } else {
+            toSerie.addSpecificTileToSerie(convertWsTileToLogicTile(tileToAdd), targetPosition); //maybe need to check if to add to end 
+
+        }
         Platform.runLater(() -> {
             showGameBoard();
             showPlayerHandWs();
@@ -916,10 +923,12 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         int targetPosition = event.getTargetSequencePosition();
         Point target= new Point(targetSerie,targetPosition);
         Point source= new Point(sourceSerie,sourcePosition);
-        SingleMove singleMove= new SingleMove(target,source, SingleMove.MoveType.BOARD_TO_BOARD);
-        PlayersMove playerMove=new PlayersMove(new ArrayList<>(), new Board(new ArrayList<>(this.logicBoard.getListOfSerie())), myDetails.isPlayedFirstSequence());
+        SingleMove singleMove = new SingleMove(target,source, SingleMove.MoveType.BOARD_TO_BOARD);
+        PlayersMove playerMove = new PlayersMove(new ArrayList<>(),
+                                                 new Board(new ArrayList<>(this.logicBoard.getListOfSerie())),
+                                                 this.playersDetails.get(findPlayerByName(this.nameOfCurrPlayerTurn)).isPlayedFirstSequence());
         playerMove.implementSingleMove(singleMove);
-        logicBoard=playerMove.getBoardAfterMove();
+        logicBoard = playerMove.getBoardAfterMove();
         
 //        init variables in the statrt of the turn
 //Board printableBoard = new Board(new ArrayList<>(rummikubLogic.getGameBoard().getListOfSerie()));
@@ -932,6 +941,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         Platform.runLater(() -> (showGameBoard()));
 
     }
+    
 //private void handleTileMovedEvent(Event event) {
 //        int sourcePosition = event.getSourceSequencePosition();
 //        int sourceSerie = event.getSourceSequenceIndex();
