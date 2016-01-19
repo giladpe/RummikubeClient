@@ -80,6 +80,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
     private Button loadGameButton;
     private static final boolean ENABLED = true;
     private static final String CHOOSE_PLAYER = "Choose Player name: ";
+    private static final String NAMES_NOT_LOADED="Faild to load players names";
 
     public RummikubWebServiceService getService() {
         return service;
@@ -541,7 +542,9 @@ public class ServerSelectController implements ServerConnection, Initializable, 
                         playersList = rummikubWebService.getPlayersDetails(gameName);
                         prompt = CHOOSE_PLAYER + getPlayersNames(playersList);
                     } catch (GameDoesNotExists_Exception ex) {
-                        showErrorMsg(errorMsg, ex.getMessage());
+                        prompt=NAMES_NOT_LOADED;
+                    }catch (Exception ex) {
+                        prompt=NAMES_NOT_LOADED;
                     }
 
                 }
