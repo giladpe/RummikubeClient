@@ -5,10 +5,6 @@ package rummikub.view;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,10 +14,8 @@ import rummikub.client.ws.GameDetails;
 import rummikub.client.ws.GameDoesNotExists_Exception;
 import rummikub.client.ws.GameStatus;
 import rummikub.client.ws.InvalidParameters_Exception;
-import rummikub.client.ws.PlayerDetails;
 import rummikub.client.ws.RummikubWebService;
 import rummikub.client.ws.RummikubWebServiceService;
-import rummikub.gameLogic.model.logic.Settings;
 import rummikubFX.Rummikub;
 
 public class SubMenuController implements Initializable, ControlledScreen, ServerConnection {
@@ -58,23 +52,19 @@ public class SubMenuController implements Initializable, ControlledScreen, Serve
 
     @FXML
     private void handlePlayerResignedGameButtonAction(ActionEvent event) {
-        //PlayScreenController playScreen = (PlayScreenController) this.myController.getControllerScreen(Rummikub.PLAY_SCREEN_ID);
         try {
             GameDetails game = this.rummikubWebService.getGameDetails(gameName);
-            GameStatus st=game.getStatus();
-            if (st == GameStatus.ACTIVE) {
+            GameStatus status = game.getStatus();
+            
+            if (status  == GameStatus.ACTIVE) {
                 this.rummikubWebService.resign(playerID);
             }else{
-            ///maybe need   cancel timer/////////////////////
-            GameSelectController gameSelectScene = (GameSelectController) this.myController.getControllerScreen(Rummikub.GAME_SELECT_SCREEN_ID);
-        this.myController.setScreen(Rummikub.GAME_SELECT_SCREEN_ID, gameSelectScene);
+                GameSelectController gameSelectScene = (GameSelectController) this.myController.getControllerScreen(Rummikub.GAME_SELECT_SCREEN_ID);
+                this.myController.setScreen(Rummikub.GAME_SELECT_SCREEN_ID, gameSelectScene);
             }
 
         } catch (InvalidParameters_Exception | GameDoesNotExists_Exception ex) {
-            int i=0;
         }
-        
-        //playScreen.resetScreen();
     }
 
     @FXML
@@ -115,6 +105,5 @@ public class SubMenuController implements Initializable, ControlledScreen, Serve
         setService(service);
         this.gameName = gameName;
         this.playerID = playerID;
-        //getRummikubeWsEvents();
     }
 }

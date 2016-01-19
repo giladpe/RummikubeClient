@@ -131,7 +131,7 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
             resetScreen();
             this.loginButton.setDisable(false);
         } catch (MalformedURLException ex) {
-            this.errorMsg.setText("Invalid Url");/////to change
+            this.errorMsg.setText("Invalid Url");
         } catch (Exception ex) {
             this.errorMsg.setText("Can not create file");
         }

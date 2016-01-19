@@ -9,14 +9,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -39,18 +36,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import org.xml.sax.SAXException;
 import rummikub.client.ws.DuplicateGameName_Exception;
 import rummikub.client.ws.GameDetails;
 import rummikub.client.ws.GameDoesNotExists_Exception;
 import rummikub.client.ws.InvalidParameters_Exception;
 import rummikub.client.ws.InvalidXML_Exception;
 import rummikub.client.ws.PlayerDetails;
-import rummikub.client.ws.PlayerStatus;
 import rummikub.client.ws.RummikubWebService;
 import rummikub.client.ws.RummikubWebServiceService;
-import rummikub.gameLogic.model.logic.GameLogic;
-import rummikub.gameLogic.view.ioui.JaxBXmlParser;
 import rummikubFX.Rummikub;
 
 /**
@@ -60,6 +53,7 @@ import rummikubFX.Rummikub;
  */
 public class GameSelectController implements ServerConnection, Initializable, ControlledScreen, ResetableScreen {
 
+    //Constants:
     private static final String NAME_PROMPT = "Insert Player Name";
     private static final String INVALID_GAME_NAME_MSG = "Invalid game name!";
     private static final String CONTAINS_WHITE_SPACES_MSG = "Name can not statr with whitespaces!";
@@ -70,22 +64,24 @@ public class GameSelectController implements ServerConnection, Initializable, Co
     private final static String FAIL_LOADING_FILE_MSG = "Error was not able to load file!";
     private static final boolean DAEMON_THREAD = true;
     private static final long UPDATE_TIME = 3000;
+    private static final boolean ENABLED = true;
+    private static final String CHOOSE_PLAYER = "Choose Player name: ";
+    private static final String NAMES_NOT_LOADED="Faild to load players names";
+    private static final String LOST_CONNECTION_MSG = "Lost connection to server";
+    private static final String NUM_OF_HUMANS_JOINED_TABLE_LABEL = "joinedHumanPlayers";
+    private static final String PLAYER_NAME_TABLE_LABEL = "name";
+    private static final String NUM_OF_HUMAN_PLAYERS_TABLE_LABEL = "humanPlayers";
+    private static final String NUM_OF_COMPUTER_PLAYERS_TABLE_LABEL = "computerizedPlayers";
+    private static final String GAME_STATUS_TABLE_LABEL = "status";
+    //Private members
     private RummikubWebServiceService service;
     private RummikubWebService rummikubWebService;
     private int playerID;
     private String prompt;
-    //may not need : private SimpleBooleanProperty isServerSelectSceeneShow;
     private Timer timer;
+
     @FXML
     private Button loadGameButton;
-    private static final boolean ENABLED = true;
-    private static final String CHOOSE_PLAYER = "Choose Player name: ";
-    private static final String NAMES_NOT_LOADED="Faild to load players names";
-
-    public RummikubWebServiceService getService() {
-        return service;
-    }
-
     @FXML
     private GridPane GamesSettings;
     @FXML
@@ -94,12 +90,10 @@ public class GameSelectController implements ServerConnection, Initializable, Co
     private TableView<GameDetails> gamesTableView;
     @FXML
     private TableColumn<GameDetails, String> gameNameColumn;
-
     @FXML
     private TableColumn<GameDetails, Integer> computerPlayersColumn;
     @FXML
     TextField gameNameInput;
-
     @FXML
     TextField numOfHumansInput, numOfCopmputersInput;
     @FXML
@@ -126,25 +120,20 @@ public class GameSelectController implements ServerConnection, Initializable, Co
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //    sasa
-        //"joinedHumanPlayers",
-        //"loadedFromXML",
-        //this.isServerSelectSceeneShow.set(false);
         this.buttonsList.add(this.joinButton);
         this.buttonsList.add(this.loadGameButton);
         this.buttonsList.add(this.addButton);
         this.timer = new Timer();
-        this.joinedColumn.setCellValueFactory(new PropertyValueFactory<>("joinedHumanPlayers"));
-        this.gameNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        this.numOfHumanColumn.setCellValueFactory(new PropertyValueFactory<>("humanPlayers"));
-        this.computerPlayersColumn.setCellValueFactory(new PropertyValueFactory<>("computerizedPlayers"));
-        this.gameStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        this.joinedColumn.setCellValueFactory(new PropertyValueFactory<>(NUM_OF_HUMANS_JOINED_TABLE_LABEL));
+        this.gameNameColumn.setCellValueFactory(new PropertyValueFactory<>(PLAYER_NAME_TABLE_LABEL));
+        this.numOfHumanColumn.setCellValueFactory(new PropertyValueFactory<>(NUM_OF_HUMAN_PLAYERS_TABLE_LABEL));
+        this.computerPlayersColumn.setCellValueFactory(new PropertyValueFactory<>(NUM_OF_COMPUTER_PLAYERS_TABLE_LABEL));
+        this.gameStatus.setCellValueFactory(new PropertyValueFactory<>(GAME_STATUS_TABLE_LABEL));
         this.joinButton.setDisable(true);
 
         this.addButton.setOnAction(e -> addButtonClicked());
         this.joinButton.setOnAction(e -> joinButtonClicked());
         initAddButton();
-        //this.gamesTableView.selectionModelProperty().addListener(new PropertyDescriptor.Listener<>);
 
         gamesTableView.getSelectionModel().getSelectedItems().addListener((Change<? extends GameDetails> change) -> {
             try {
@@ -155,7 +144,7 @@ public class GameSelectController implements ServerConnection, Initializable, Co
                 });
             }
         });
-        ///add listener to game name 
+        
         this.gameNameInput.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
             isValidGameName();
             initAddButton();
@@ -271,14 +260,11 @@ public class GameSelectController implements ServerConnection, Initializable, Co
         initGameViewTableTimer();
         initAllButton();
         clearInputFiled();
-//        new Thread(() -> {
-//            ObservableList<GameDetails> gameList = getListOfWaittingGames();
-//            Platform.runLater(() -> {
-//                this.gamesTableView.getItems().clear();////////////
-//                gamesTableView.setItems(gameList);
-//            });
-//        }).start();
-        //this.gamesTableView.setItems(getListOfWaittingGames());
+    }
+    
+    @Override
+    public RummikubWebServiceService getService() {
+        return service;
     }
 
     private void isNumericChar(TextField text) {
@@ -291,16 +277,6 @@ public class GameSelectController implements ServerConnection, Initializable, Co
             String num = new String(charArr);
             text.setText(num);
         }
-    }
-//        private void isNumericChar(TextField text) {
-//        if (!text.getText().isEmpty()&&!text.getText().matches("\\d*")) {
-//            text.clear();
-//            showErrorMsg(errorMsg, INVALID_NUMBER);
-//        }
-//    }
-
-    private void isValidNumOfComputerPlayers(String text) {
-        //TODO
     }
 
     private boolean isValidTextField(String str) {
@@ -356,7 +332,7 @@ public class GameSelectController implements ServerConnection, Initializable, Co
 
     private boolean isAllSet() {
         boolean allSet = true;
-        if (/*this.playerNameInput.getText().isEmpty() || */this.gameNameInput.getText().isEmpty()) {
+        if (this.gameNameInput.getText().isEmpty() /* || this.playerNameInput.getText().isEmpty() */) {
             allSet = false;
         }
         if (getNumOfHumansPlayers() > 4 || getNumOfHumansPlayers() < 1) {
@@ -452,15 +428,6 @@ public class GameSelectController implements ServerConnection, Initializable, Co
             
             this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
 
-            //STACKS when computer player starts
-//            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, ScreensController.NOT_RESETABLE);
-//            
-//            try{
-//                Thread.sleep(UPDATE_TIME);
-//            } catch (InterruptedException ex) {}
-//            
-//            gameScreen.resetScreen();
-
         } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
             Platform.runLater(() -> {
                 showErrorMsg(errorMsg, ex.getMessage());
@@ -474,7 +441,7 @@ public class GameSelectController implements ServerConnection, Initializable, Co
 
     private void onServerLostException() {
         Platform.runLater(() -> {
-            showErrorMsg(errorMsg, "Lost connection to server");
+            showErrorMsg(errorMsg, LOST_CONNECTION_MSG);
             Platform.runLater(() -> (clearInputFiled()));
         });
     }
@@ -540,7 +507,6 @@ public class GameSelectController implements ServerConnection, Initializable, Co
                 String gameName = gameDetails.getName();
                 prompt = NAME_PROMPT;
                 if (gameDetails.isLoadedFromXML()) {
-                    ///toooo deal with connect to server exption 
                     List<PlayerDetails> playersList;
                     try {
                         playersList = rummikubWebService.getPlayersDetails(gameName);
@@ -566,7 +532,7 @@ public class GameSelectController implements ServerConnection, Initializable, Co
     private String getPlayersNames(List<PlayerDetails> playersList) {
         String res = "";
         for (PlayerDetails playerDetails : playersList) {
-//||!playerDetails.getStatus().equals(PlayerStatus.JOINED
+            //||!playerDetails.getStatus().equals(PlayerStatus.JOINED
             if (playerDetails.getStatus()==null) {
                 res += playerDetails.getName() + ",";
             }
@@ -577,30 +543,3 @@ public class GameSelectController implements ServerConnection, Initializable, Co
         return res;
     }
 }
-
-//public class NumberTextField extends TextField
-//{
-//
-//    @Override
-//    public void replaceText(int start, int end, String text)
-//    {
-//        if (validate(text))
-//        {
-//            super.replaceText(start, end, text);
-//        }
-//    }
-//
-//    @Override
-//    public void replaceSelection(String text)
-//    {
-//        if (validate(text))
-//        {
-//            super.replaceSelection(text);
-//        }
-//    }
-//
-//    private boolean validate(String text)
-//    {
-//        return text.matches("[0-9]*");
-//    }
-//}
