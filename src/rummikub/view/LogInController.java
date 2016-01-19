@@ -17,6 +17,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -28,6 +31,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -69,6 +73,8 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     private static final String ADDRESS_ELEMENT = "address";
     private static final String PORT_ELEMENT = "port";
     private static final String HTTP = "http://";
+    private static final String CREATE_FILE_ERROR="Can not create file";
+    private static final String INVALID_URL="Invalid Url";
     private static final boolean DAEMON_THREAD = true;
 
     /**
@@ -117,7 +123,7 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
                     try {
                         CreateXMLDoc(ROOT_ELEMENT, elements, urlAttribute);
                     } catch (Exception ex) {
-                        this.errorMsg.setText("Can not create file");
+                        showErrorMsg(errorMsg, CREATE_FILE_ERROR);
                     }
                 });
                 newThread.setDaemon(DAEMON_THREAD);
@@ -131,10 +137,12 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
             resetScreen();
             this.loginButton.setDisable(false);
         } catch (MalformedURLException ex) {
-            this.errorMsg.setText("Invalid Url");
+            this.errorMsg.setText(INVALID_URL);
         } catch (Exception ex) {
-            this.errorMsg.setText("Can not create file");
+            this.errorMsg.setText(CREATE_FILE_ERROR);
         }
+        loginButton.setDisable(false);
+        
     }
 
     private void loadServerFromFile() {
@@ -229,6 +237,24 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     private void initLoginButton() {
         this.loginButton.setDisable(this.address.getText().isEmpty() || this.port.getText().isEmpty());
     }
+    public static void disappearAnimation(javafx.scene.Node node) {
+        FadeTransition animation = new FadeTransition();
+        animation.setNode(node);
+        animation.setDuration(Duration.seconds(3));
+        animation.setFromValue(1.0);
+        animation.setToValue(0.0);
+        animation.play();
+    }
+
+    public static void showErrorMsg(Label label, String msg) {
+        label.setText(msg);
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0.5), (ActionEvent event) -> {
+            disappearAnimation(label);
+        }));
+        timeline.setCycleCount(1);
+        timeline.play();
+    }
+
 }
 // <editor-fold defaultstate="collapsed" desc="Web service Info">
 // Web service Info - START //
