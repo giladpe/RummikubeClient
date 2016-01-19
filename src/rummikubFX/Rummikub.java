@@ -14,25 +14,15 @@ import rummikub.view.ScreensController;
 public class Rummikub extends Application {
 
     //Constants:
-   // public static final String MAINMENU_SCREEN_ID = "mainMenu";
-   // public static final String MAINMENU_SCREEN_FXML = "MainMenu.fxml";
-
-    //public static final String GAME_PARAMETERS_SCREEN_ID = "gameParameters";
-    //public static final String GAME_PARAMETERS_FXML = "GameParameters.fxml";
 
     public static final String PLAY_SCREEN_ID = "playScreen";
     public static final String PLAY_SCREEN_FXML = "PlayScreen.fxml";
-
     public static final String SUBMENU_SCREEN_ID = "subMenu";
     public static final String SUBMENU_SCREEN_FXML = "SubMenu.fxml";
-
-    //public static final String SAVE_GAME_SCREEN_ID = "saveGameMenu";
-    //public static final String SAVE_GAME_FXML = "SaveGameMenu.fxml";
-
     public static final String RESULT_SCREEN_ID = "resultScreen";
     public static final String RESULT_SCREEN_FXML = "ResultScreen.fxml";
-    public static final String SERVER_SELECT_SCREEN_ID = "serverSelectScreen";
-    public static final String SERVER_SELECT_SCREEN_FXML = "ServerSelect.fxml";
+    public static final String GAME_SELECT_SCREEN_ID = "serverSelectScreen";
+    public static final String GAME_SELECT_SCREEN_FXML = "ServerSelect.fxml";
     public static final String LOGIN_SCREEN_ID = "loginScreen";
     public static final String LOGIN_SCREEN_FXML = "LogIn.fxml";
     
@@ -40,7 +30,6 @@ public class Rummikub extends Application {
     public void start(Stage primaryStage) {
         
         primaryStage.setOnCloseRequest((WindowEvent event) -> {
-            
             Platform.exit();
             System.exit(0);
         });
@@ -50,7 +39,7 @@ public class Rummikub extends Application {
         screensController.loadScreen(PLAY_SCREEN_ID, PLAY_SCREEN_FXML);
         screensController.loadScreen(SUBMENU_SCREEN_ID, SUBMENU_SCREEN_FXML);
         screensController.loadScreen(RESULT_SCREEN_ID, RESULT_SCREEN_FXML);
-        screensController.loadScreen(SERVER_SELECT_SCREEN_ID, SERVER_SELECT_SCREEN_FXML);
+        screensController.loadScreen(GAME_SELECT_SCREEN_ID, GAME_SELECT_SCREEN_FXML);
         screensController.setScreen(LOGIN_SCREEN_ID, ScreensController.NOT_RESETABLE);
         StackPane root = new StackPane();
         root.getChildren().addAll(screensController);
@@ -58,7 +47,6 @@ public class Rummikub extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    
     
     /**
      * @param args the command line arguments

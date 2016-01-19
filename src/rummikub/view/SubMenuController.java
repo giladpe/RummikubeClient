@@ -66,8 +66,8 @@ public class SubMenuController implements Initializable, ControlledScreen, Serve
                 this.rummikubWebService.resign(playerID);
             }else{
             ///maybe need   cancel timer/////////////////////
-            ServerSelectController gameSelectScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
-        this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSelectScene);
+            GameSelectController gameSelectScene = (GameSelectController) this.myController.getControllerScreen(Rummikub.GAME_SELECT_SCREEN_ID);
+        this.myController.setScreen(Rummikub.GAME_SELECT_SCREEN_ID, gameSelectScene);
             }
 
         } catch (InvalidParameters_Exception | GameDoesNotExists_Exception ex) {

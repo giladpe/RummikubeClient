@@ -5,7 +5,6 @@
  */
 package rummikub.view;
 
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
@@ -77,20 +76,18 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //this.address.setText("http://localhost");
-        //this.port.setText("8080");
 
         init();
-        
+
         this.address.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
             addressF = this.address.getText();
-        
+
             initLoginButton();
         });
-        
+
         this.port.textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
             this.portF = this.port.getText();
-            
+
             initLoginButton();
         });
         changeServerCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) -> {
@@ -105,21 +102,20 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
 
     @Override
     public void resetScreen() {
-        init();        
+        init();
     }
 
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
         this.loginButton.setDisable(true);
         try {
-            //create a URL
-            //URL location = new URL( address.getText() + ":" + port.getText() + "/RummikubApi/RummikubWebServiceService?wsdl");
             if (!address.isDisable()) {
                 String[] urlAttribute = {this.addressF, portF};
                 String[] elements = {ADDRESS_ELEMENT, PORT_ELEMENT};
 
-                Thread newThread = new Thread(()->{try {
-                    CreateXMLDoc(ROOT_ELEMENT, elements, urlAttribute);
+                Thread newThread = new Thread(() -> {
+                    try {
+                        CreateXMLDoc(ROOT_ELEMENT, elements, urlAttribute);
                     } catch (Exception ex) {
                         this.errorMsg.setText("Can not create file");
                     }
@@ -128,10 +124,10 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
                 newThread.start();
             }
             URL location = new URL(HTTP + addressF + ":" + portF + RUMMIKUB_API);
-            ServerSelectController gameSelectScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.SERVER_SELECT_SCREEN_ID);
-            
+            GameSelectController gameSelectScene = (GameSelectController) this.myController.getControllerScreen(Rummikub.GAME_SELECT_SCREEN_ID);
+
             gameSelectScene.setService(new RummikubWebServiceService(location));
-            this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, gameSelectScene);
+            this.myController.setScreen(Rummikub.GAME_SELECT_SCREEN_ID, gameSelectScene);
             resetScreen();
             this.loginButton.setDisable(false);
         } catch (MalformedURLException ex) {
@@ -141,7 +137,7 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
         }
     }
 
-    private void getAddressFromFile() {
+    private void loadServerFromFile() {
         try {
             File fXmlFile = new File(RESOURCES_FOLDER + CONIGURATION_FILE);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -160,7 +156,7 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
                 this.port.setText(portF);
             });
         } catch (Exception ex) {
-            Platform.runLater(()->{
+            Platform.runLater(() -> {
                 this.errorMsg.setText("cannot open file");
                 this.addressF = this.portF = "";
                 this.address.setDisable(false);
@@ -172,6 +168,13 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     private void initServerChanges(Boolean new_val) {
         this.address.setDisable(!new_val);
         this.port.setDisable(!new_val);
+        if (!new_val) {
+            Thread thread = new Thread(() -> {
+                loadServerFromFile();
+            });
+            thread.setDaemon(DAEMON_THREAD);
+            thread.start();
+        }
     }
 
     @FXML
@@ -215,8 +218,10 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
     private void init() {
         this.address.setDisable(true);
         this.port.setDisable(true);
-        
-        Thread newThread = new Thread(()->{ getAddressFromFile(); });
+
+        Thread newThread = new Thread(() -> {
+            loadServerFromFile();
+        });
         newThread.setDaemon(DAEMON_THREAD);
         newThread.start();
     }

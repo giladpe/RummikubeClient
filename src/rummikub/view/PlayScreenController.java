@@ -57,35 +57,33 @@ import rummikub.view.viewObjects.AnimatedTilePane;
 public class PlayScreenController implements Initializable, ResetableScreen, ControlledScreen, ServerConnection {
 
     //Constatns
-    private static final String PLAY = " Play";
-    private static final String WAIT = " Wait";
-    private static final boolean DAEMON_THREAD = true;
-    private static final long TIMER_DELAY = 800;
+    private static final String CANT_DRAG="Can't drag this tile";
     private static final String STYLE_WHITE = "-fx-text-fill: white";
     private static final String STYLE_GREEN = "-fx-text-fill: green";
-    private static final boolean CAN_SAVE_THE_GAME = false;
-    private static final int MAX_NUM_OF_PLAYERS = 4;
-    private static final boolean VISABLE = true;
-    private static final boolean LEGAL_MOVE = true;
-    private static final boolean ENABLE_BUTTON = true;
-    private static final boolean DISABLE_DRAG_AND_DROP = true;
-    private static final int INDEX_NORMALIZATION = 1;
-
-
-    //Private members
-    private RummikubWebServiceService service;
-    private RummikubWebService rummikubWebService;
-    private int playerID;
-    private int currEvent;
-    private String gameName;
-    private List<PlayerDetails> playersDetails;
-    private int currEventId;
-    private PlayerDetails myDetails;
-    private Board logicBoard;
-
     private static final String PLAYER_RESIGNED = " decided to quite";
     private static final String PLAYER_DONE = " done is Turn";
     private static final String GAME_OVER = "Game Is Over";
+    private static final String PLAY = " Play";
+    private static final String WAIT = " Wait";
+    private static final String SPACE=" ";
+
+    private static final boolean DAEMON_THREAD = true;
+    private static final boolean CAN_SAVE_THE_GAME = false;
+    private static final boolean VISABLE = true;
+    private static final boolean LEGAL_MOVE = true;
+    private static final boolean DISABLE_DRAG_AND_DROP = true;
+    private static final int INDEX_NORMALIZATION = 1;
+    private static final int MAX_NUM_OF_PLAYERS = 4;
+    private int playerID;
+    private int currEventId;
+    private static final long TIMER_DELAY = 800;
+    //Private members
+    private RummikubWebServiceService service;
+    private RummikubWebService rummikubWebService;
+    private String gameName;
+    private List<PlayerDetails> playersDetails;
+    private PlayerDetails myDetails;
+    private Board logicBoard;
     private Timer timer;
     private final ArrayList<Label> playersLabelsList = new ArrayList<>();
     private ScreensController myController;
@@ -152,18 +150,15 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         subMenuController.setService(service);
         this.myController.setScreen(Rummikub.SUBMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
-
-    @FXML
-    private void handleEndTrunAction(ActionEvent event) {
+    @FXML private void handleEndTrunAction(ActionEvent event) {
         Thread thread = new Thread(() -> {
             try {
                 this.rummikubWebService.finishTurn(playerID);
             } catch (InvalidParameters_Exception ex) {
-                ///to do 
                 Platform.runLater(() -> showGameMsg(errorMsg, ex.getMessage()));
-            } //catch(Exception ex) {
-            //onServerLostException();
-            //}
+            } catch (Exception ex) {
+                onServerLostException();
+            }
         });
         thread.setDaemon(DAEMON_THREAD);
         thread.start();
@@ -182,11 +177,11 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             }
         } catch (InvalidParameters_Exception ex) {
             Platform.runLater(() -> (showGameMsg(errorMsg, ex.getMessage())));
-        } //catch(Exception ex) {
-        //onServerLostException();
-        //}
+        } catch (Exception ex) {
+            onServerLostException();
+        }
 
-        this.timer = new Timer(DAEMON_THREAD);// allready open new thared 
+        this.timer = new Timer(DAEMON_THREAD);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -197,9 +192,15 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     //Private methods
     private void setHandEvents() {
-        this.handTile.setOnDragOver(this::onDragOverOfHandTilePane);
-        this.handTile.setOnDragDropped(this::onDragDroppedOfHandTilePane);
-        this.handTile.setOnDragDone(this::onDragDoneOfHandTilePane);
+        try{
+            this.handTile.setOnDragOver(this::onDragOverOfHandTilePane);
+            this.handTile.setOnDragDropped(this::onDragDroppedOfHandTilePane);
+            this.handTile.setOnDragDone(this::onDragDoneOfHandTilePane);
+    }catch (Exception ex){
+            Platform.runLater(()->showGameMsg(errorMsg, CANT_DRAG));
+        
+    }
+    
     }
 
     private void onDragDoneOfHandTilePane(DragEvent event) {
@@ -263,17 +264,14 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         Platform.runLater(() -> {
             setPlayersBarWs();
             initPlayerLabelWs();
-
         });
-//        initAboveHeapLabel();
-//        initHeapButton();
     }
 
     private void setLabelWs(PlayerDetails player, int index) {
         Label currentPlayer = this.playersLabelsList.get(index);
         playersBarList.get(index).setVisible(true);
         currentPlayer.setVisible(true);
-        currentPlayer.setText(" " + player.getName() + "  ");
+        currentPlayer.setText(SPACE + player.getName() + SPACE);
         currentPlayer.setAlignment(Pos.CENTER);
         currentPlayer.setTextAlignment(TextAlignment.JUSTIFY);
         if (isHumanPlayer(player)) {
@@ -285,7 +283,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     private void setLabel(Player player, int index) {
         Label currentPlayer = this.playersLabelsList.get(index);
-
         playersBarList.get(index).setVisible(true);
         currentPlayer.setVisible(true);
         currentPlayer.setText(" " + player.getName() + "  ");
@@ -305,10 +302,9 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             createPlayerHandWs(myDetails.getTiles());
         } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
             showGameMsg(errorMsg, ex.getMessage());
-        } //catch(Exception ex) {
-        //onServerLostException();
-        //}
-
+        } catch(Exception ex) {
+            onServerLostException();
+        }
     }
 
     private void onMakeSingleMove(SingleMove singleMove) {
@@ -345,38 +341,25 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 Platform.runLater(() -> (showGameMsg(this.errorMsg, ex.getMessage())));
                 isLegal = false;
                 this.isLegalMove.set(isLegal);
-            } //catch(Exception ex) {
-            // onServerLostException();
-            //}
+            } catch(Exception ex) {
+                onServerLostException();
+            }
         });
         thread.setDaemon(DAEMON_THREAD);
         thread.start();
-
-//        if (!this.isUserMadeFirstMoveInGame) {
-//            this.isUserMadeFirstMoveInGame = !CAN_SAVE_THE_GAME;
-//        }
-//        try {
-//            isLegal = dealWithSingleMoveResualt(singleMove);
-//        } catch (Exception ex) {
-//            isLegal = false;
-//            initCurrentPlayerMove();
-//            showGameBoardAndPlayerHand();
-//        }
     }
 
     private void onSuccesfulyCompletedMove(boolean newVal) {
         if (newVal) {
             initPlayerLabelWs();
-            //updateCurrPlayerBarWs(nameOfCurrPlayerTurn);
             try {
                 this.myDetails = rummikubWebService.getPlayerDetails(playerID);
             } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
                 showGameMsg(errorMsg, ex.getMessage());
-            } //catch(Exception ex) {
-            //  onServerLostException();
-            //}
+            } catch(Exception ex) {
+                onServerLostException();
+            }
             this.isLegalMove.set(!LEGAL_MOVE);
-            //showCurrentGameBoardAndCurrentPlayerHand();
         }
     }
 
@@ -396,15 +379,13 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         serieFlowPane.getChildren().addListener((ListChangeListener.Change<? extends Node> c) -> {
             onChangeOfSerieContent(serieFlowPane);
         });
-
         for (Tile tile : serie.getSerieOfTiles()) {
             AnimatedTilePane viewTile = new AnimatedTilePane(tile);
             initTileListeners(viewTile);
             serieFlowPane.getChildren().add(viewTile);
         }
-
         serieFlowPane.setMinWidth(serieFlowPane.getChildren().size() * 30);
-
+        
         return serieFlowPane;
     }
 
@@ -425,12 +406,11 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                         }
                         index++;
                     }
-                    index=0;
+                    index = 0;
                     for (PlayerDetails playerDetails : playersDetails) {
                         if (playerDetails.getStatus() == PlayerStatus.ACTIVE) {
                             this.labelOfNumOfTileInHandList.get(index).setText(String.valueOf(playerDetails.getNumberOfTiles()));
-                        }
-                        else {
+                        } else {
                             this.labelOfNumOfTileInHandList.get(index).setText(" - RETIRED!!!");
                         }
                         index++;
@@ -438,27 +418,14 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
                 });
             } catch (GameDoesNotExists_Exception ex) {
                 Platform.runLater(() -> (showGameMsg(errorMsg, ex.getMessage())));
-            }  //catch(Exception ex) {
-            //                onServerLostException();
-            //            }
+            } catch (Exception ex) {
+                onServerLostException();
+            }
         });
         thread.setDaemon(DAEMON_THREAD);
         thread.start();
-        //need to move to turn message updateCurrPlayerBar();
     }
 
-//    private void initAboveHeapLabel() {
-//        this.heapTile.setStyle(styleWhite);
-//        this.heapTile.setText("Tile Left:" + rummikubLogic.getHeap().getTileList().size());
-//    }
-//
-//    private void initHeapButton() {
-//        if (rummikubLogic.getHeap().isEmptyHeap()) {
-//            this.withdrawCard.setFont(new Font(14));
-//            this.withdrawCard.setText("Empy Deck");
-//            this.withdrawCard.setDisable(true);
-//        }
-//    }
     public static void disappearAnimation(Node node) {
         FadeTransition animation = new FadeTransition();
         animation.setNode(node);
@@ -476,76 +443,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         timeline.setCycleCount(1);
         timeline.play();
     }
-
-//    private boolean dealWithSingleMoveResualt(SingleMove singleMove) {
-//        SingleMove.SingleMoveResult singleMoveResualt;
-//        singleMoveResualt = this.currentPlayerMove.implementSingleMove(singleMove);
-//        boolean isLegalMoveDone = false;
-//        switch (singleMoveResualt) {
-//            case TILE_NOT_BELONG_HAND: {
-//                showGameMsg(this.errorMsg, Utils.Constants.ErrorMessages.ILEGAL_TILE_IS_NOT_BELONG_TO_HAND);
-//                break;
-//            }
-//            case NOT_IN_THE_RIGHT_ORDER: {
-//                showGameMsg(this.errorMsg, Utils.Constants.ErrorMessages.ILEGAL_TILE_INSERTED_NOT_IN_RIGHT_ORDER);
-//                break;
-//            }
-//            case CAN_NOT_TOUCH_BOARD_IN_FIRST_MOVE: {
-//                showGameMsg(this.errorMsg, Utils.Constants.ErrorMessages.ILEGAL_CANT_TUCH_BOARD_IN_FIRST_MOVE);
-//                break;
-//            }
-//            case LEGAL_MOVE:
-//            default:
-//                showGameMsg(this.errorMsg, Utils.Constants.QuestionsAndMessagesToUser.SUCCSESSFUL_MOVE);
-//                isLegalMoveDone = true;
-//                break;
-//        }
-//        return isLegalMoveDone;
-//    }
-    // Deals with the computer player and allows him to makes his inputs
-//    private SingleMove dealWithComputerPlayer() {
-//        SingleMove singleMove;
-//        Serie serie;
-//
-//        if (newMoveGenerator.isFinishedGeneratingLastSerie()) {
-//            serie = this.serieGenerator.generateSerieMove(currentPlayerMove.getHandAfterMove(), currentPlayerMove.getIsFirstMoveDone());
-//            this.newMoveGenerator.setSerieToPlaceOnBoard(serie);
-//
-//            if (serie != null) {
-//                this.newMoveGenerator.setBoardSizeBeforeMove(currentPlayerMove.getBoardAfterMove().boardSize());
-//            }
-//        }
-//
-//        singleMove = newMoveGenerator.generateSingleMove(currentPlayerMove.getHandAfterMove(), currentPlayerMove.getBoardAfterMove());
-//
-//        if (this.newMoveGenerator.isTurnSkipped()) {
-//            currentPlayerMove.setIsTurnSkipped(this.newMoveGenerator.isTurnSkipped());
-//        }
-//
-//        return singleMove;
-//    }
-//    private void ImplementComputerPlayerTurn(SingleMove singleMove) {
-//        if (singleMove != null) {
-//            try {
-//                dealWithSingleMoveResualt(singleMove);
-//            } catch (Exception ex) {
-//                currentPlayerMove.setIsTurnSkipped(PlayersMove.USER_WANT_SKIP_TRUN);
-//            }
-//        }
-//    }
-//    private void updateCurrPlayerBarWs(String currPlayerName) {
-//        int index = findPlayerByName(currPlayerName);
-//        for (Node child : this.playersBarList.get(index).getChildren()) {
-//            child.setStyle(STYLE_GREEN);
-//
-//        }
-//        if (playersDetails.get(index).isPlayedFirstSequence()) {
-//            this.firstMoveMsg.setStyle(STYLE_WHITE);
-//            this.firstMoveMsg.setVisible(true);
-//        } else {
-//            this.firstMoveMsg.setVisible(!VISABLE);
-//        }
-//    }
 
     private void setFirstTurnMsg() {
         this.firstMoveMsg.setVisible(true);
@@ -583,47 +480,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             ((AnimatedSeriePane) serieFlowPane).setSize();
         }
     }
-
-//    private void showGameBoardAndPlayerHand() {
-//        initScreenComponentetWithoutBoard();
-//        showGameBoard();
-//    }
-//    public void showCurrentGameBoardAndCurrentPlayerHand() {
-//        showCurrentPlayerBoard();
-//        showCurrentPlayerHand();
-//    }
-//    private void onEndTurnAcions(ActionEvent event) {
-////        if (swapTurnTimeLineDelay.getStatus() == Animation.Status.STOPPED) {
-//        try {
-//            //check the player move
-//            rummikubWebService.finishTurn(playerID);
-//            disableButtons();
-//        } catch (InvalidParameters_Exception ex) {
-//            showGameMsg(errorMsg, ex.getMessage());
-//        }// catch(Exception ex) {
-////                onServerLostException();
-////        }
-        // Swap players
-//            if (rummikubLogic.isGameOver()) {
-//                onGameFinished();
-//            } else {
-        //      swapTurnTimeLineDelay.play();
-        //}
-        //}
-//    }
-//    private void onWithdrawCardAndSkipTurnAction(ActionEvent event) {
-//        if (swapTurnTimeLineDelay.getStatus() == Animation.Status.STOPPED) {
-//
-//            this.currentPlayerMove.setIsTurnSkipped(PlayersMove.USER_WANT_SKIP_TRUN);
-//            this.rummikubLogic.playSingleTurn(currentPlayerMove);
-//
-//            if (rummikubLogic.isGameOver() || rummikubLogic.isOnlyOnePlayerLeft()) {
-//                onGameFinished();
-//            } else {
-//                swapTurnTimeLineDelay.play();
-//            }
-//        }
-//    }
 
     private void handleRummikubWsEvent(rummikub.client.ws.Event event) {
         // <editor-fold defaultstate="collapsed" desc="Game Events Description">
@@ -699,31 +555,9 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         }
     }
 
-//    public void createNewGame(Settings gameSetting) {
-//        this.rummikubLogic.setGameSettings(gameSetting);
-//        //A: i changed it to new....
-//        //this.rummikubLogic.setGameOriginalInputedSettings(gameSetting);
-//        this.rummikubLogic.setGameOriginalInputedSettings(new Settings(gameSetting));
-//        this.rummikubLogic.initGameFromUserSettings();
-//        initCurrentPlayerMove();
-//    }
-//    public void initAllGameComponents() {
-//        initScreenComponentetWithoutBoard();
-//        try {
-//            new Thread(() -> {
-//                defineIfTheTurnOfHumanOrComputer();
-//            }).start();
-//        } catch (Exception ex) {
-//            this.myController.setScreen(Rummikub.MAINMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
-//        }
-//    }
     public synchronized void showGameBoard() {
         setBoard(logicBoard.getListOfSerie());
     }
-//
-//    public void showCurrentPlayerBoard() {
-//        setBoard();
-//    }
 
     public boolean getIsUserMadeFirstMoveInGame() {
         return isUserMadeFirstMoveInGame;
@@ -736,9 +570,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         this.serieGenerator = new SeriesGenerator();
         this.newMoveGenerator = new ComputerSingleMoveGenerator();
         this.board.setCenter(centerPane);
-//        this.swapTurnTimeLineDelay = new Timeline(new KeyFrame(Duration.millis(800), (ActionEvent event1) -> {
-//            swapTurns();
-//        }));
         this.isLegalMove = new SimpleBooleanProperty(false);
         this.isUserMadeFirstMoveInGame = CAN_SAVE_THE_GAME;
         setHandEvents();
@@ -746,11 +577,9 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     @Override
     public void resetScreen() {
-        //((AnimatedGameBoardPane) this.board.getCenter()).resetScreen();
         resetPlayersBar();
         handTile.getChildren().clear();
         this.errorMsg.setText(Utils.Constants.EMPTY_STRING);
-        //show();
         this.centerPane.resetScreen();
         getRummikubeWsEvents();
     }
@@ -796,15 +625,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         this.menu.setDisable(false);
     }
 
-    private void handleGameStartEvent(rummikub.client.ws.Event eventGameStart) {
-        try {
+    private void handleGameStartEvent(rummikub.client.ws.Event eventGameStart) throws GameDoesNotExists_Exception, InvalidParameters_Exception{
             initScreenComponentetWithoutBoardWs(eventGameStart);
-        } catch (GameDoesNotExists_Exception ex) {
-            ///go back to serverSelectSceen
-        } catch (InvalidParameters_Exception ex) {
-            ///go back to serverSelectSceen
-        }
-
     }
 
     private void setPlayersBarWs() {
@@ -827,7 +649,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         this.myDetails = myDetails;
         disableButtons();
         this.currEventId = 0;
-        //getRummikubeWsEvents();
     }
 
     private void handleGameWinnerEvent(Event event) {
@@ -853,7 +674,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         });
         if (myDetails.getName().equalsIgnoreCase(playerResignedName)) {
             this.timer.cancel();
-            this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, ScreensController.NOT_RESETABLE);
+            this.myController.setScreen(Rummikub.GAME_SELECT_SCREEN_ID, ScreensController.NOT_RESETABLE);
             //old: i think it is wrong because it starts getting events again
             //this.myController.setScreen(Rummikub.SERVER_SELECT_SCREEN_ID, this);
         }

@@ -58,7 +58,7 @@ import rummikubFX.Rummikub;
  *
  * @author giladPe
  */
-public class ServerSelectController implements ServerConnection, Initializable, ControlledScreen, ResetableScreen {
+public class GameSelectController implements ServerConnection, Initializable, ControlledScreen, ResetableScreen {
 
     private static final String NAME_PROMPT = "Insert Player Name";
     private static final String INVALID_GAME_NAME_MSG = "Invalid game name!";
