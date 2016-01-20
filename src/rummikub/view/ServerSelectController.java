@@ -426,7 +426,7 @@ public class ServerSelectController implements ServerConnection, Initializable, 
             gameScreen.initWsSetting(service, gameName, playerID, myDetails);
             this.timer.cancel();
             
-            Platform.runLater(()->(this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen)));
+            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
 
         } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
             Platform.runLater(() -> {
