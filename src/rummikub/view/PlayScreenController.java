@@ -125,6 +125,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         SubMenuController subMenuController = (SubMenuController) this.myController.getControllerScreen(Rummikub.SUBMENU_SCREEN_ID);
         subMenuController.setPlayerId(playerID);
         subMenuController.setService(service);
+        subMenuController.initResignButtun(isMyTurn());
         this.myController.setScreen(Rummikub.SUBMENU_SCREEN_ID, ScreensController.NOT_RESETABLE);
     }
 
@@ -244,8 +245,8 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     private void setLabelWs(PlayerDetails player, int index) {
         Label currentPlayer = this.playersLabelsList.get(index);
-        playersBarList.get(index).setVisible(true);
-        currentPlayer.setVisible(true);
+        playersBarList.get(index).setVisible(VISABLE);
+        currentPlayer.setVisible(VISABLE);
         currentPlayer.setText(SPACE + player.getName() + SPACE);
         currentPlayer.setAlignment(Pos.CENTER);
         currentPlayer.setTextAlignment(TextAlignment.JUSTIFY);
@@ -404,7 +405,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     }
 
     private void setFirstTurnMsg() {
-        this.firstMoveMsg.setVisible(true);
+        this.firstMoveMsg.setVisible(VISABLE);
         this.firstMoveMsg.setVisible(myDetails.isPlayedFirstSequence());
 
     }
@@ -505,7 +506,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     //Public methods
     public void resetPlayersBar() {
         for (HBox playerBar : this.playersBarList) {
-            playerBar.setVisible(!VISABLE);
+          //  playerBar.setVisible(!VISABLE);
         }
     }
 
@@ -531,11 +532,17 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     @Override
     public void resetScreen() {
-        resetPlayersBar();
+        //resetPlayersBar();
         handTile.getChildren().clear();
         this.errorMsg.setText(Utils.Constants.EMPTY_STRING);
         this.centerPane.resetScreen();
-        getRummikubeWsEvents();
+        Thread thread = new Thread(() -> {
+            getRummikubeWsEvents();
+        });
+        thread.setDaemon(DAEMON_THREAD);
+        thread.start();
+
+
     }
 
     @Override
@@ -781,6 +788,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
     private void handleGameOverEven(Event event) {
         Platform.runLater(() -> {
             disableButtons();
+            resetPlayersBar();
             showGameMsg(errorMsg, GAME_OVER);
         });
     }

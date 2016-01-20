@@ -55,7 +55,6 @@ public class SubMenuController implements Initializable, ControlledScreen, Serve
         try {
             GameDetails game = this.rummikubWebService.getGameDetails(gameName);
             GameStatus status = game.getStatus();
-            
             if (status  == GameStatus.ACTIVE) {
                 this.rummikubWebService.resign(playerID);
             }else{
@@ -108,5 +107,9 @@ public class SubMenuController implements Initializable, ControlledScreen, Serve
         setService(service);
         this.gameName = gameName;
         this.playerID = playerID;
+    }
+
+    void initResignButtun(boolean myTurn) {
+        this.ResignedGame.setDisable(!myTurn);
     }
 }
