@@ -21,7 +21,7 @@ public class Rummikub extends Application {
     public static final String SUBMENU_SCREEN_FXML = "SubMenu.fxml";
     public static final String RESULT_SCREEN_ID = "resultScreen";
     public static final String RESULT_SCREEN_FXML = "ResultScreen.fxml";
-    public static final String GAME_SELECT_SCREEN_ID = "serverSelectScreen";
+    public static final String GAME_SELECT_SCREEN_ID = "ServerSelectScreen";
     public static final String GAME_SELECT_SCREEN_FXML = "ServerSelect.fxml";
     public static final String LOGIN_SCREEN_ID = "loginScreen";
     public static final String LOGIN_SCREEN_FXML = "LogIn.fxml";

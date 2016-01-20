@@ -89,9 +89,9 @@ public class ScreensController extends StackPane {
         return screensController.get(name);
     }
     public void setScreen(final String name, ResetableScreen resetableScreen) {
-//        if (resetableScreen!=null){
-//            resetableScreen.resetScreen();
-//        }
+        if (resetableScreen!=null){
+            resetableScreen.resetScreen();
+        }
         if (!getChildren().isEmpty()) {
             Timeline fade = new Timeline(this.fadeFrameValue, makeKeyFrameEffect(name,resetableScreen));
             fade.play();

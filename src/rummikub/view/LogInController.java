@@ -130,7 +130,7 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
                 newThread.start();
             }
             URL location = new URL(HTTP + addressF + ":" + portF + RUMMIKUB_API);
-            GameSelectController gameSelectScene = (GameSelectController) this.myController.getControllerScreen(Rummikub.GAME_SELECT_SCREEN_ID);
+            ServerSelectController gameSelectScene = (ServerSelectController) this.myController.getControllerScreen(Rummikub.GAME_SELECT_SCREEN_ID);
 
             gameSelectScene.setService(new RummikubWebServiceService(location));
             this.myController.setScreen(Rummikub.GAME_SELECT_SCREEN_ID, gameSelectScene);
@@ -139,7 +139,7 @@ public class LogInController implements Initializable, ControlledScreen, Resetab
         } catch (MalformedURLException ex) {
             this.errorMsg.setText(INVALID_URL);
         } catch (Exception ex) {
-            this.errorMsg.setText(CREATE_FILE_ERROR);
+           showErrorMsg(errorMsg,"Server Error");
         }
         loginButton.setDisable(false);
         

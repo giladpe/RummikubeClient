@@ -158,7 +158,7 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
         } catch (Exception ex) {
             onServerLostException();
         }
-
+        
         this.timer = new Timer(DAEMON_THREAD);
         timer.schedule(new TimerTask() {
             @Override
@@ -409,10 +409,6 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
 
     }
 
-    private void onGameFinished() {
-        this.myController.setScreen(Rummikub.RESULT_SCREEN_ID, ScreensController.NOT_RESETABLE);
-    }
-
     private void initTileListeners(AnimatedTilePane viewTile) {
         if (isMyTurn()) {
             viewTile.addSingleMoveListener((ObservableValue<? extends SingleMove> observable, SingleMove oldValue, SingleMove newValue) -> {
@@ -634,7 +630,10 @@ public class PlayScreenController implements Initializable, ResetableScreen, Con
             this.myController.setScreen(Rummikub.GAME_SELECT_SCREEN_ID, ScreensController.NOT_RESETABLE);
         }
     }
-
+    public void cancelTimer(){
+        timer.cancel();
+    
+    }
     private void handlePlayerTurnEvent(Event event) {
         this.nameOfCurrPlayerTurn = event.getPlayerName();
         String turnMsg = getTurnMsg();

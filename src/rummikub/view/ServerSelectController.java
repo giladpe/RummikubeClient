@@ -51,7 +51,7 @@ import rummikubFX.Rummikub;
  *
  * @author giladPe
  */
-public class GameSelectController implements ServerConnection, Initializable, ControlledScreen, ResetableScreen {
+public class ServerSelectController implements ServerConnection, Initializable, ControlledScreen, ResetableScreen {
 
     //Constants:
     private static final String NAME_PROMPT = "Insert Player Name";
@@ -426,7 +426,7 @@ public class GameSelectController implements ServerConnection, Initializable, Co
             gameScreen.initWsSetting(service, gameName, playerID, myDetails);
             this.timer.cancel();
             
-            this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen);
+            Platform.runLater(()->(this.myController.setScreen(Rummikub.PLAY_SCREEN_ID, gameScreen)));
 
         } catch (GameDoesNotExists_Exception | InvalidParameters_Exception ex) {
             Platform.runLater(() -> {
